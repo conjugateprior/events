@@ -112,6 +112,7 @@ one_a_day <- function(edo){
 ##' @param edo Event data object 
 ##' @return A short description of the event data
 ##' @author Will Lowe
+##' @export 
 ##' @method summary eventdata
 summary.eventdata <- function(edo){
   src <- sum(table(edo$source)>0)
@@ -539,6 +540,7 @@ scale_codes <- function(es){
 ##' @param es Scale
 ##' @return Nothing, used for side effect
 ##' @author Will Lowe
+##' @export 
 ##' @method summary eventscale
 summary.eventscale <- function(es){
   nme <- attr(es, 'name')

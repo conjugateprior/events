@@ -69,10 +69,11 @@ This can also be applied as part of the \texttt{read\_keds} function.
 \subsection{Actor Filtering}
 
 In the next step we filter out actors whose interactions are not of interest.  
-A complete list of actors is given by
+A complete list of actors is given by \texttt{actors} function
 <<echo=TRUE,fig=FALSE>>=
 head(actors(dd1))
 @
+The functions \texttt{sources} and \texttt{targets} list actor codes in the corresponding roles, and \texttt{codes} lists all the codes that are used.
 
 We will focus on actors identified in the data as Serbia `SER' and the Serbian military `SERMIL', and Bosnia `BOS' and the Bosnian 
 military `BOSMIL'
@@ -81,18 +82,17 @@ dd2 <- filter_actors(dd1, fun=spotter("SER", "SERMIL", "BOS", "BOSMIL"))
 @
 The \texttt{filter\_actors} function takes two arguments, an event data set and a filter function, 
 and returns a filtered
-event data set.  The filter may be any user-specified R function that returns TRUE for things that are of 
+event data set.  The filter may be any function that returns TRUE for things that are of 
 interest and FALSE otherwise.  Here we have used a convenience function \texttt{spotter}, which creates a function that returns TRUE for any exact matches of its arguments.  
 
-The function takes an optional \texttt{which} argument which can be used to specify that the filtering should apply to `source', `target' or `both' (the default).
+The function takes an optional \texttt{which} argument which can be used to specify that the filtering should apply to `source', `target' or `both', which is the default.
 
-We would like to treat the Serbian and Bosnian actors identified in the previous step as equivalent and refer to then for convenience as `ser' and `bos' respectively.  We do this by aggregating actor codes
-we aggregate actor codes.
+We would like to treat the Serbian and Bosnian actors identified in the previous step as equivalent and refer to then for convenience as `ser' and `bos' respectively.  We do this by aggregating actor codes:
 <<echo=TRUE,fig=FALSE>>=
 actor.agg <- list(ser=c("SER", "SERMIL"), bos=c("BOS", "BOSMIL"))
 dd3 <- map_actors(dd2, fun=actor.agg)
 @
-Here we specify the mapping from new to old actor codes as a list and pass it to the mapping function.  We could also have written a function that for any object returned its new name, in the same style as the filter function in the previous section.  For example, the function
+Here we specify the mapping from new to old actor codes as a list and pass it to the mapping function.  We could also have written a function that for any object returned its new name, in the same style as the filter function in the previous section.  For example
 \begin{verbatim}
 actor.aggregator <- function(oldname){ 
     newname <- NA
@@ -101,7 +101,7 @@ actor.aggregator <- function(oldname){
     return(newname)
 }
 \end{verbatim}
-would work, but is rather longwinded to write.
+would work, but it's rather longwinded.
 
 \subsection{Temporal Restriction}
 
@@ -111,7 +111,7 @@ dd4 <- filter_time(dd3, start="1991-01-01", end="1995-12-30")
 @
 The optional \texttt{start} and \texttt{end} parameters may be anything that can be converted into a \texttt{Date} object.
 
-Our new data set is now considerably smaller than before
+The new data set is considerably smaller than before
 <<echo=TRUE,fig=FALSE>>=
 summary(dd4)
 @
@@ -139,7 +139,7 @@ The final step is to aggregate quantities of interest into a regular time series
 dyads <- make_dyads(dd5, scale="goldstein", unit="week", monday=TRUE, 
 		fun=sum, missing.data=0)
 @
-We assert that weekly counts should start on a monday, that they should be summed rather than e.g. averaged, and that weeks with no events observed should be given score zero.  Note that this is only an example; these are not necessarily sensible setting for actual applications.  
+We are asserting here that weekly counts should start on a monday, that they should be summed rather than e.g. averaged, and that weeks with no events observed should be given score zero.  Note that this is only an example; these are not necessarily sensible setting for actual applications.  
 
 Alternative aggregation units are `day', `month', `quarter', and `year'.  The fun parameter should be any function that will transform a numerical vector into a scalar.
 
@@ -151,7 +151,7 @@ The directed dyad can be treated like a regular time series:
 <<serbos,echo=TRUE,fig=TRUE,width=6.5,height=3.5>>=
 with(dyads$ser.bos, plot(goldstein ~ date, type="l", lwd=2))
 @
-There are a few gaps in the series.  This is because the scale does not cover all the events that occur in the event data
+There are a few gaps in this series.  This is because the scale does not cover all the events that occur in the event data.  We can investigate this further with
 <<echo=TRUE,fig=FALSE>>=
 scale_coverage(weis.goldstein.scale, dd5)
 @
