@@ -1,0 +1,12 @@
+Package: events
+Type: Package
+Title: Store and manipulate event data
+Version: 0.4
+Date: 2011-12-03
+Author: Will Lowe
+Maintainer: Will Lowe <will.lowe@uni-mannheim.de>
+Description: Stores, manipulates, aggregates and otherwise messes with event
+    data from KEDS/TABARI or any other extraction tool with similar output
+License: GPL
+Collate:
+    'events.R'
