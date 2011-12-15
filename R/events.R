@@ -109,17 +109,18 @@ one_a_day <- function(edo){
 ##' you won't feel a thing when this happens.
 ##' 
 ##' @title Summarise event data
-##' @param edo Event data object 
+##' @param object Event data object 
+##' @param ... Not used
 ##' @return A short description of the event data
 ##' @author Will Lowe
 ##' @export 
 ##' @method summary eventdata
-summary.eventdata <- function(edo){
-  src <- sum(table(edo$source)>0)
-  trg <- sum(table(edo$target)>0)
-  start <- format(min(edo$date), "%a %b %d, %Y")
-  end <- format(max(edo$date), format="%a %b %d, %Y")
-  all <- nrow(edo)
+summary.eventdata <- function(object, ...){
+  src <- sum(table(object$source)>0)
+  trg <- sum(table(object$target)>0)
+  start <- format(min(object$date), "%a %b %d, %Y")
+  end <- format(max(object$date), format="%a %b %d, %Y")
+  all <- nrow(object)
   cat(paste(all, "events", "involving", src, "sources and",
             trg, "targets", "\n"))
   cat(paste("from", start, "to", end, "\n"))
@@ -537,18 +538,19 @@ scale_codes <- function(es){
 ##' Print summary statistics for an eventscale.
 ##'
 ##' @title Summarise an eventscale
-##' @param es Scale
+##' @param object Scale
+##' @param ... Not used
 ##' @return Nothing, used for side effect
 ##' @author Will Lowe
 ##' @export 
 ##' @method summary eventscale
-summary.eventscale <- function(es){
-  nme <- attr(es, 'name')
-  des <- attr(es, 'desc')
-  def <- attr(es, 'default')
-  len.es <- length(es)
-  max.es <- max(unlist(es))
-  min.es <- min(unlist(es))
+summary.eventscale <- function(object, ...){
+  nme <- attr(object, 'name')
+  des <- attr(object, 'desc')
+  def <- attr(object, 'default')
+  len.es <- length(object)
+  max.es <- max(unlist(object))
+  min.es <- min(unlist(object))
   cat(paste("Scale name:", nme, "\n"))
   if ((!is.null(des)) & (des != ""))
     cat(paste(des, "\n"))
