@@ -2,10 +2,12 @@
 \alias{summary.eventscale}
 \title{Summarise an eventscale}
 \usage{
-  \method{summary}{eventscale} (es)
+  \method{summary}{eventscale} (object, ...)
 }
 \arguments{
-  \item{es}{Scale}
+  \item{object}{Scale}
+
+  \item{...}{Not used}
 }
 \value{
   Nothing, used for side effect

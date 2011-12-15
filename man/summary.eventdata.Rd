@@ -2,10 +2,12 @@
 \alias{summary.eventdata}
 \title{Summarise event data}
 \usage{
-  \method{summary}{eventdata} (edo)
+  \method{summary}{eventdata} (object, ...)
 }
 \arguments{
-  \item{edo}{Event data object}
+  \item{object}{Event data object}
+
+  \item{...}{Not used}
 }
 \value{
   A short description of the event data
