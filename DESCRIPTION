@@ -5,6 +5,7 @@ Version: 0.4
 Date: 2011-12-03
 Author: Will Lowe
 Maintainer: Will Lowe <will.lowe@uni-mannheim.de>
+Depends: R (>= 2.10)
 Description: Stores, manipulates, aggregates and otherwise messes with event
     data from KEDS/TABARI or any other extraction tool with similar output
 License: GPL
