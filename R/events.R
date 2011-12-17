@@ -628,7 +628,7 @@ NULL
 #' of conflict and cooperation, developed by the KEDS project.
 #' Taken from the documentation of the KEDS_Count software.
 #'
-#' The version of CAMEO used here is \textbf{0.9B5 [08.04.15]}.
+#' The version of CAMEO used here is 0.9B5 [08.04.15].
 #'
 #' @name cameo.scale
 #' @docType data
