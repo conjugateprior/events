@@ -1,13 +1,13 @@
-# The `events` Package
+# The events Package
 
-The aim of `events` is to make life a bit easier for people who
+The aim of events is to make life a bit easier for people who
 analyse event data: the kind of thing that KEDS/TABARI generates as
 output.  There's nothing fancy in the package, just a logically
 structured interface to all the data massaging we do to event data
 before any actual analysis.
 
 The philosophy of the package is that you will want to read in raw
-event data and then apply a sequence of filters and aggregations of
+event data and then apply a sequence of filters and aggregators for
 actors and event types, each of which result in an new event data set,
 and finish by applying `make_dyads` to make a set of named temporally
 regular directed dyad time series suitable for time series analysis.
@@ -24,7 +24,7 @@ data](http://eventdata.psu.edu/software.dir/utilities.html) pages.
 
 The unification is certainly not complete, but we're getting there.
 In particular, extremely large data sets are probably going to be
-rather unwieldy in the current version of `events`.
+rather unwieldy in the current version.
 
 The sections below provide a quick compare and contrast to the PSU
 software that works with event data output (not Factiva stuff or actor
@@ -32,7 +32,7 @@ dictionaries).
 
 ### High-Volume Processing Suite
 
-Nope, all this stuff is out of reach, but `events` has plans for
+Nope, all this stuff is out of reach, but there are plans for
 accessing databases as sources of event data that will probably cover
 this sort of thing.
 
@@ -50,22 +50,28 @@ option in the event data reading function `read_keds`.
 ### Event_Filter
 
 Since I can't figure out what this program does, there are probably no
-functions in `events` to replicate it.
+functions to replicate it.
 
 ### KEDS_Count
 
-Most, but not all, of the functionality of KEDS_Count is available in
-`events`.  Some differences are noted below:
+Most, but not all, of the functionality of KEDS_Count is implemented.  
+Some differences are noted below:
 
  * Aggregation is possible by day, week, month, quarter and year, but
-   not biweekly.  
+   not biweekly.
 
  * There is no choice of date format: `read_keds` just assumes that it's
-   going to be yyMMdd.  This may be relaxed in later versions.
+   going to be yyMMdd.  This may be relaxed in later versions.  
 
- * Multiple input files are not automatically dealt with in `events`,
+ * `read_keds` assumes that two digit year specifications 69 to 99
+   indicate years between 1969 to 1999, and 00 to 68 indicate 2000 to
+   2068.  This is R and the POSIX standard interpretation for this needlessly
+   ambiguous date formulation.  In contrast KEDS_Count treats 28 to 99 as 
+   in the twentieth century and 00 to 27 as in the twenty first century.
+
+ * Multiple input files are not automatically dealt with,
    although this is planned.  Concatenating the files before reading them
-   in is a simple option for all but Windows users.
+   is a simple option for all except Windows users.
 
  * Wildcarding for actors nand event codes is not implemented
    directly, so you have to use R's facilities.  An example using
@@ -74,8 +80,8 @@ Most, but not all, of the functionality of KEDS_Count is available in
    parameter.
 
  * KEDS_Count aggregates up to a temporal unit, e.g. a week,
-   differently to `events`: It tosses events that occur before the
-   beginning of the first full unit whereas `make_dyads` does not.
+   differently to `events`:  It tosses events that occur before the
+   beginning of the first full unit.  `make_dyads` does not.
    There is no warning about this behaviour, but then it doesn't eat
    your data either.
 

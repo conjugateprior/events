@@ -596,7 +596,9 @@ inv.fisher.transform <- function(x){
 #' Balkans conflict events in WEIS encoding
 #'
 #' Event data on the conflict during the collapse of Yugoslavia.  Events are
-#' coded according to an extended WEIS scheme by the KEDS Project.
+#' coded according to an extended WEIS scheme by the KEDS Project.  The event
+#' stream contains 72953 events occurring between 2 April 1989 and 31 July 2003
+#' involving 325 actors.
 #'
 #' @name balkans.weis
 #' @docType data
@@ -605,14 +607,30 @@ inv.fisher.transform <- function(x){
 #' @keywords data
 NULL
 
-#' WEIS codes to Goldstein's conflict-cooperation scale
+#' WEIS codes to Goldstein conflict-cooperation scale
 #'
 #' A mapping of WEIS event codes to [-10,10] representing a scale
-#' of conflict and cooperation, developed by Joshua Goldstein.  
-#' Note: This mapping does not cover all the events in \code{balkans.weis}.
+#' of conflict and cooperation, developed by Joshua Goldstein and
+#' slightly extended for the KEDS project.  
+#' Note: This mapping does not cover all the event codes in \code{balkans.weis}.
 #' Taken from the KEDS Project's documentation.
 #'
 #' @name weis.goldstein.scale
+#' @docType data
+#' @author KEDS Project
+#' @references \url{http://web.ku.edu/~keds/}
+#' @keywords data
+NULL
+
+#' CAMEO codes to conflict-cooperation scale
+#'
+#' A mapping of CAMEO event codes to [-10,10] representing a scale
+#' of conflict and cooperation, developed by the KEDS project.
+#' Taken from the documentation of the KEDS_Count software.
+#'
+#' The version of CAMEO used here is \textbf{0.9B5 [08.04.15]}.
+#'
+#' @name cameo.scale
 #' @docType data
 #' @author KEDS Project
 #' @references \url{http://web.ku.edu/~keds/}
