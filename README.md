@@ -64,8 +64,8 @@ Some differences are noted below:
    going to be yyMMdd.  This may be relaxed in later versions.  
 
  * `read_keds` assumes that two digit year specifications 69 to 99
-   indicate years between 1969 to 1999, and 00 to 68 indicate 2000 to
-   2068.  This is R and the POSIX standard interpretation for this needlessly
+   indicate years between 1969 to 1999, and 00 to 68 indicate 2000 to 2068.  
+   This is R and the POSIX standard interpretation for this needlessly
    ambiguous date formulation.  In contrast KEDS_Count treats 28 to 99 as 
    in the twentieth century and 00 to 27 as in the twenty first century.
 
