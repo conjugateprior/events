@@ -9,8 +9,7 @@
   software.
 }
 \details{
-  The version of CAMEO used here is \textbf{0.9B5
-  [08.04.15]}.
+  The version of CAMEO used here is 0.9B5 [08.04.15].
 }
 \author{
   KEDS Project
