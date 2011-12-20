@@ -595,7 +595,7 @@ summary.eventscale <- function(object, ...){
 add_eventscale <- function(edo, sc){
   scname <- attr(sc, 'name') 
   def <- attr(sc, 'default')
-  edo[[scname]] <- scale(sc, edo$code)
+  edo[[scname]] <- score(sc, edo$code)
   class(edo) <- c('scaled.eventdata', class(edo))
   return(edo)
 }
