@@ -72,10 +72,15 @@ read_keds <- function(d, keep.quote=FALSE, keep.desc=TRUE, one.a.day=TRUE, scrub
   	ff$desc <- NULL
   
   if (scrub.keds)
-  	ff <- scrub.keds(ff)
+  	ff <- scrub_keds(ff)
+  else
+        ff$code <- factor(ff$code) ## a side effect of scrib_keds
+
+  ## assert temporal order
+  ff <- ff[order(ff$date),]
 
   if (one.a.day)
-  	ff <- one.a.day(ff)
+  	ff <- one_a_day(ff)
   
   class(ff) <- c("eventdata", class(ff))
   return(ff) 
