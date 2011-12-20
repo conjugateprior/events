@@ -1,4 +1,4 @@
-context('Loading event data')
+context('Testing reading KEDS format event data')
 
 acts <- c("ARN","BIL","BRE","CAL","DAG","ENT","ERI","FOR","FRO","GON",
             "ITH","MOR","NGO","ORC","OSG","ROH", "SAM","UNO")

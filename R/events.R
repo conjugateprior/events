@@ -107,7 +107,7 @@ one_a_day <- function(edo){
 ##' Summarises a set of event data
 ##'
 ##' This is a compact summary of an event data object.  For more detail
-##' consult the object itself.  Currently this is simply a data.frame with 
+##' consult the object itself.  Currently it is simply a data.frame with 
 ##' conventionally named column names, but that almost certainly will change to
 ##' deal with larger datasets in later package versions.  
 ##' If your code uses the package's accessor functions then
@@ -137,7 +137,7 @@ summary.eventdata <- function(object, ...){
 ##' It is the workhorse function behind the \code{filter_} functions.
 ##' You should use these in ordinary use.
 ##' 
-##' @title Filter events data 
+##' @title Filter events data
 ##' @param edo Events data object
 ##' @param fun Function that shoudl be applied 
 ##' @param which Which field should be filtered
@@ -320,10 +320,6 @@ make_fun_from_list <- function(lst){
   return(f)
 }
 
-## takes either a function that hands back a new name
-## or a list(newname=c('oldname', 'othername'))
-
-
 ##' Aggregates actor codes
 ##'
 ##' The function relabels actor codes according to the filter.
@@ -353,11 +349,6 @@ map_actors <- function(edo, fun=function(x){return(x)}){
   edo$source <- factor(src)
   return(edo)
 }
-
-## non-null scale does a numeric aggregation using fun, inserts missing.data when none
-## null scale generates count vectors of all event types that occur.
-## Does every combination of actors in the data
-## Only one scale is ever present, which must be specified
 
 ##' Aggregates events to a regular time interval
 ##'
@@ -454,8 +445,6 @@ plot_dyad <- function(dyad, ...){
   with(dyad, plot(dyad$date, dyad[[scalename]], ...))
 }
 
-## ellipses are extra arguments to read.csv (row.names=1 is assumed)
-
 ##' Makes an event scale
 ##'
 ##' Makes an event scale from a specification found in a file or 
@@ -498,6 +487,35 @@ make_scale <- function(name, types=NULL, values=NULL, file=NULL, desc="", defaul
   attr(v, 'default') <- def
   class(v) <- c('eventscale', class(v))
   return(v)
+}
+
+##' Gets scale scores for event codes
+##'
+##' Returns an array of scores corresponding to the the second
+##' argument's scale values or the scale's default value if
+##' not recognized.
+##' 
+##' You should use this function to avoid
+##' relying on the internal structure of event scales.  They 
+##' are currently lists, but this may change.
+##' 
+##' @title Score event codes with an event scale
+##' @param eventscale An event scale
+##' @param codes Event codes
+##' @return Numerical values for each event codes from the scale
+##' @export
+##' @author Will Lowe
+score <- function(eventscale, codes){
+  if (is.factor(codes))
+    codes <- as.character(codes) 
+
+  def <- attr(eventscale, 'default')
+  ## seem to need to do this so NAs are not dropped
+  dd <- sapply(codes, function(x){ 
+      ff <- eventscale[[x]] 
+      ifelse(is.null(ff), def, ff) 
+    })
+  return(as.numeric(dd))
 }
 
 ##' Checks coverage of scale for event data
@@ -577,12 +595,7 @@ summary.eventscale <- function(object, ...){
 add_eventscale <- function(edo, sc){
   scname <- attr(sc, 'name') 
   def <- attr(sc, 'default')
-  ## turns
-  mapper <- function(x){ 
-    v <- sc[[x]]
-        ifelse(!is.numeric(v), def, v)
-      }
-  edo[[scname]] <- sapply(as.character(edo$code), mapper)
+  edo[[scname]] <- scale(sc, edo$code)
   class(edo) <- c('scaled.eventdata', class(edo))
   return(edo)
 }

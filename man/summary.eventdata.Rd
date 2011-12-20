@@ -17,7 +17,7 @@
 }
 \details{
   This is a compact summary of an event data object.  For
-  more detail consult the object itself.  Currently this is
+  more detail consult the object itself.  Currently it is
   simply a data.frame with conventionally named column
   names, but that almost certainly will change to deal with
   larger datasets in later package versions. If your code
