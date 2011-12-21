@@ -1,4 +1,4 @@
-context('Testing reading KEDS format event data')
+context('Check read_keds')
 
 acts <- c("ARN","BIL","BRE","CAL","DAG","ENT","ERI","FOR","FRO","GON",
             "ITH","MOR","NGO","ORC","OSG","ROH", "SAM","UNO")
@@ -12,7 +12,7 @@ cds <- c("023","024","031","032","033","041","042","044","045","050",
 
 test_that("read_keds works without one a day", {
   dd <- read_keds('./tabari-demo.keds', one.a.day=FALSE)
-  expect_equal(dim(dd), c(77,5))
+  expect_equal(nrow(dd), 77)
   expect_that(dd, is_a('eventdata'))
   expect_that(dd$date, is_a('Date'))
   expect_that(dd$source, is_a('factor'))
@@ -29,7 +29,7 @@ test_that("read_keds works without one a day", {
 
 test_that("read_keds works with with one a day", {
   dd <- read_keds('./tabari-demo.keds')
-  expect_equal(dim(dd), c(66,5)) ## duplicates removed
+  expect_equal(nrow(dd), 66) ## duplicates removed
   expect_that(dd, is_a('eventdata'))
   expect_that(dd$date, is_a('Date'))
   expect_that(dd$source, is_a('factor'))
@@ -51,3 +51,11 @@ test_that("testing one_a_day filter", {
   dd2 <- one_a_day(dd)
   expect_identical(dd2, tabari.demo)
 })
+
+test_that("read_keds works with multiple files", {
+  dd <- read_keds(c('./tabari-demo.keds', './tabari-demo.keds'), one.a.day=TRUE)
+  expect_equal(nrow(dd), 66)
+  dd <- read_keds(c('./tabari-demo.keds', './tabari-demo.keds'), one.a.day=FALSE)
+  expect_equal(nrow(dd), 154)
+})
+

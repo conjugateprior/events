@@ -37,33 +37,46 @@ scrub_keds <- function(edo){
   return(edo)
 }
 
-##' Reads a KEDS event data output file
+##' Reads KEDS event data output files
 ##'
 ##' Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
 ##' and the \code{\link{one_a_day}} duplicate removal filter.  This function is thin wrapper
 ##' around \code{read.csv}.
 ##'
-##' This function assumes that output data is a tab separated text file wherein the
-##' first field is a date in \code{yymmdd} format, the second and third fields are actor
-##' codes, the fourth field is an string event code, and the fifth field is a
-##' matched noun phrase.  The last two fields are optional and can be discarded when
+##' This function assumes that \code{f} are a vector of KEDS/TABARI output files.
+##' These are assumed to be tab separated text files wherein the
+##' first field is a date in \code{yymmdd} format or as specified by \code{date.format}, 
+##' the second and third fields are actor
+##' codes, the fourth field is an event code, and the fifth field is a
+##' textual description of the event type, and the sixth field is the text from which 
+##' the event code was inferred.  The last two fields are optional and can be discarded when
 ##' reading in.
 ##' 
-##' @title Read KEDS events file 
-##' @param d Filename
+##' @title Read KEDS events files 
+##' @param d Names of files of KEDS/TABARI output
 ##' @param keep.quote Whether the exact noun phrase be retained
 ##' @param keep.desc Whether the label for the event code should be retained
 ##' @param one.a.day Whether to apply the duplicate event remover
 ##' @param scrub.keds Whether to apply the data cleaner
-##' @return Event data
+##' @param date.format How dates are represented in the first column
+##' @return An event data set
 ##' @export
 ##' @author Will Lowe
-read_keds <- function(d, keep.quote=FALSE, keep.desc=TRUE, one.a.day=TRUE, scrub.keds=TRUE){ 
-  ff <- read.csv(d, sep='\t', 
-                 head=FALSE, 
-                 col.names=c('date', 'source', 'target', 'code', 'desc', 'quote'),
-                 colClasses=c("character", "factor", "factor", "character", "character"))
-  ff$date <- as.Date(as.character(ff$date), '%y%m%d')
+read_keds <- function(d, keep.quote=FALSE, keep.desc=TRUE, one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d"){ 
+
+  read_keds_file <- function(dd){
+    read.csv(dd, sep='\t', head=FALSE, 
+             col.names=c('date', 'source', 'target', 'code', 'desc', 'quote'),
+             colClasses=c("character", "factor", "factor", "character", "character"))    
+  }
+
+  ff <- read_keds_file(d[1])
+  if (length(d)>1)
+    for (i in 2:length(d))
+      ff <- rbind(ff, read_keds_file(d[i]))
+
+  ## make dates dates
+  ff$date <- as.Date(as.character(ff$date), date.format)
 
   if (!keep.quote)
   	ff$quote <- NULL
