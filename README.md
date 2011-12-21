@@ -60,20 +60,13 @@ Some differences are noted below:
  * Aggregation is possible by day, week, month, quarter and year, but
    not biweekly.
 
- * There is no choice of date format: `read_keds` just assumes that it's
-   going to be yyMMdd.  This may be relaxed in later versions.  
-
  * `read_keds` assumes that two digit year specifications 69 to 99
    indicate years between 1969 to 1999, and 00 to 68 indicate 2000 to 2068.  
    This is R and the POSIX standard interpretation for this needlessly
    ambiguous date formulation.  In contrast KEDS_Count treats 28 to 99 as 
    in the twentieth century and 00 to 27 as in the twenty first century.
 
- * Multiple input files are not automatically dealt with,
-   although this is planned.  Concatenating the files before reading them
-   is a simple option for all except Windows users.
-
- * Wildcarding for actors nand event codes is not implemented
+ * Wildcarding for actors and event codes is not implemented
    directly, so you have to use R's facilities.  An example using
    `grep` is provided in the vignette.  Also, using "***" to mean 'all
    targets' is done by using `filter_actors` with a suitable second
@@ -86,19 +79,17 @@ Some differences are noted below:
    your data either.
 
  * KEDS_Count only offers summed scores and provides the per time unit
-   N to construct means.  `events` will use any aggregating function
+   N to construct means.  This package will use any aggregating function
    you give it, e.g. `sd` or `median` and also automatically generate
    N.
    
 ### Aggregator
 
-Unlike Aggregator, `events` does not have a customizable aggregation
+Unlike Aggregator, events does not have a customizable aggregation
 period, but it is a lot more flexible about what the aggregation
 function is (see above).
 
 ## Planned
 
- * Multiple input file support
- * More flexible time format reading
+ * More test coverage.  `make_dyads` coverage is still lacking
  * Database connection for larger data sources
- * Tests.  Mmmm, tests...
