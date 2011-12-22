@@ -598,7 +598,7 @@ score <- function(eventscale, codes){
 ##'
 ##' Returns an array of event codes that occur in an event data set but are not
 ##' assigned values by the scale.  These are the codes that will, in subsequent processing,
-##' be assigned the scales default value.
+##' be assigned the scale's default value.
 ##' 
 ##' @title Check coverage of scale for event data
 ##' @param sc An eventscale
@@ -661,7 +661,8 @@ summary.eventscale <- function(object, ...){
 ##' Applies an eventscale to event data
 ##'
 ##' Applies an eventscale to event data.  This adds a new field in the event data
-##' with the same name as the eventscale. 
+##' with the same name as the eventscale.  Add as many as you want to keep 
+##' around.
 ##' @title Apply eventscale to event data
 ##' @param edo Event data
 ##' @param sc scale
