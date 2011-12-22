@@ -10,7 +10,7 @@
 ##' @author Will Lowe
 spotter <- function(...){
   lst <- unlist(list(...))
-  f <- function(x){x %in% lst }
+  f <- function(x){x %in% lst}
   return(f)
 }
 
@@ -37,6 +37,64 @@ scrub_keds <- function(edo){
   return(edo)
 }
 
+read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d", sep='\t', head=FALSE){
+
+  which.letter <- function(l, s){
+     res <- grep(l, unlist(strsplit(s, '')))
+     out <- ifelse(length(res)>0, res, -1)     
+     return(out)
+  }
+  
+  trim_whitespace <- function(x){
+    as.vector(sapply(x, gsub, pattern="^\\s+|\\s+$", replacement=''))
+  }
+
+  date.col <- which.letter('D', col.format)
+  source.col <- which.letter('S', col.format)
+  target.col <- which.letter('T', col.format)
+  code.col <- which.letter('C', col.format)
+  if (sum(c(date.col=-1, source.col=-1, target.col=-1, code.col=-1))>0)
+    stop("Could not find all of D, T, S, and C in col.format")
+  ## optionals
+  label.col <- which.letter('L', col.format)
+  quote.col <- which.letter('Q', col.format)
+
+  read_ed_file <- function(d){
+    vv <- read.csv(d, sep=sep, head=head, colClasses="character")
+    dd <- data.frame(date=vv[,date.col], source=factor(vv[,source.col]), 
+                     target=factor(vv[,target.col]), code=factor(vv[,code.col]))
+    if (label.col != -1)
+      dd$label <- vv[,label.col]
+    if (quote.col != -1)
+      dd$quote <- vv[,quote.col]
+    dd
+  }
+
+  ff <- read_ed_file(d[1])
+  if (length(d)>1)
+    for (i in 2:length(d))
+      ff <- rbind(ff, read_ed_file(d[i]))
+
+  ## make dates dates
+  ff$date <- as.Date(as.character(ff$date), date.format)
+
+  if (scrub.keds)
+  	ff <- scrub_keds(ff)
+  else
+        ff$code <- factor(ff$code) ## a side effect of scrub_keds
+
+  ## assert temporal order
+  ff <- ff[order(ff$date),]
+
+  if (one.a.day)
+  	ff <- one_a_day(ff)
+  
+  class(ff) <- c("eventdata", class(ff))
+  return(ff) 
+  
+  
+}  
+
 ##' Reads KEDS event data output files
 ##'
 ##' Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
@@ -48,25 +106,25 @@ scrub_keds <- function(edo){
 ##' first field is a date in \code{yymmdd} format or as specified by \code{date.format}, 
 ##' the second and third fields are actor
 ##' codes, the fourth field is an event code, and the fifth field is a
-##' textual description of the event type, and the sixth field is the text from which 
-##' the event code was inferred.  The last two fields are optional and can be discarded when
-##' reading in.
+##' text label for the event type, and the sixth field is a quote - some kind of
+##' text from which the event code was inferred.  Label and quote are optional and can 
+##' be discarded when reading in.
 ##' 
 ##' @title Read KEDS events files 
 ##' @param d Names of files of KEDS/TABARI output
 ##' @param keep.quote Whether the exact noun phrase be retained
-##' @param keep.desc Whether the label for the event code should be retained
+##' @param keep.label Whether the label for the event code should be retained
 ##' @param one.a.day Whether to apply the duplicate event remover
 ##' @param scrub.keds Whether to apply the data cleaner
 ##' @param date.format How dates are represented in the first column
 ##' @return An event data set
 ##' @export
 ##' @author Will Lowe
-read_keds <- function(d, keep.quote=FALSE, keep.desc=TRUE, one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d"){ 
+read_keds <- function(d, keep.quote=FALSE, keep.label=TRUE, one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d"){ 
 
   read_keds_file <- function(dd){
     read.csv(dd, sep='\t', head=FALSE, 
-             col.names=c('date', 'source', 'target', 'code', 'desc', 'quote'),
+             col.names=c('date', 'source', 'target', 'code', 'label', 'quote'),
              colClasses=c("character", "factor", "factor", "character", "character"))    
   }
 
@@ -81,13 +139,13 @@ read_keds <- function(d, keep.quote=FALSE, keep.desc=TRUE, one.a.day=TRUE, scrub
   if (!keep.quote)
   	ff$quote <- NULL
 
-  if (!keep.desc)
-  	ff$desc <- NULL
+  if (!keep.label)
+  	ff$label <- NULL
   
   if (scrub.keds)
   	ff <- scrub_keds(ff)
   else
-        ff$code <- factor(ff$code) ## a side effect of scrib_keds
+        ff$code <- factor(ff$code) ## a side effect of scrub_keds
 
   ## assert temporal order
   ff <- ff[order(ff$date),]
