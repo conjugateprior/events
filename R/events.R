@@ -37,6 +37,42 @@ scrub_keds <- function(edo){
   return(edo)
 }
 
+##' Reads event data output files in free format
+##'
+##' Reads event data output and optionally applies the \code{\link{scrub_keds}} cleaning function
+##' and the \code{\link{one_a_day}} duplicate removal filter.
+##'
+##' This function assumes that \code{d} is a vector of output files.
+##' These are assumed to be \code{sep}-separated text files.  The column
+##' ordering is given by the \code{col.format} parameter:
+##' \itemize{
+##' D the date field
+##' S the source actor field
+##' T the target actor field
+##' C the event code field
+##' L the event code label field (optional)
+##' Q the quote field (optional)
+##' . (or anything not shown above) an ignorable column
+##' }
+##' e.g. the defaul "D.STC" format means that column 1 is the date, column 2 should be 
+##' ignored, column 3 is the source, column 4 is the target, and column 5 is the event
+##' code.  The optional quote and label column are not searched for.
+##'
+##' The code plucks out just these columns, formats them appropriately and ignores 
+##' everything else in the file.  Only D, S, T, C, and C are required.
+##'
+##' The format of the date field is given by \code{format.date} 
+##' 
+##' @title Read event data files 
+##' @param d Names of event data files
+##' @param keep.quote Whether this text field should be retained
+##' @param keep.label Whether the label for the event code should be retained
+##' @param one.a.day Whether to apply the duplicate event remover
+##' @param scrub.keds Whether to apply the data cleaner
+##' @param date.format How dates are represented in the orginal file
+##' @return An event data set
+##' @export
+##' @author Will Lowe
 read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d", sep='\t', head=FALSE){
 
   which.letter <- function(l, s){
@@ -60,9 +96,11 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
   quote.col <- which.letter('Q', col.format)
 
   read_ed_file <- function(d){
-    vv <- read.csv(d, sep=sep, head=head, colClasses="character")
-    dd <- data.frame(date=vv[,date.col], source=factor(vv[,source.col]), 
-                     target=factor(vv[,target.col]), code=factor(vv[,code.col]))
+    vv <- read.csv(d, sep=sep, head=head, strip.white=TRUE, colClasses="character")
+    dd <- data.frame(date=vv[,date.col], 
+                     source=factor(vv[,source.col]), 
+                     target=factor(vv[,target.col]),
+                     code=factor(vv[,code.col]))
     if (label.col != -1)
       dd$label <- vv[,label.col]
     if (quote.col != -1)
@@ -81,7 +119,7 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
   if (scrub.keds)
   	ff <- scrub_keds(ff)
   else
-        ff$code <- factor(ff$code) ## a side effect of scrub_keds
+    ff$code <- factor(ff$code) ## a side effect of scrub_keds
 
   ## assert temporal order
   ff <- ff[order(ff$date),]
@@ -90,9 +128,7 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
   	ff <- one_a_day(ff)
   
   class(ff) <- c("eventdata", class(ff))
-  return(ff) 
-  
-  
+  return(ff)   
 }  
 
 ##' Reads KEDS event data output files
@@ -101,7 +137,7 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
 ##' and the \code{\link{one_a_day}} duplicate removal filter.  This function is thin wrapper
 ##' around \code{read.csv}.
 ##'
-##' This function assumes that \code{f} are a vector of KEDS/TABARI output files.
+##' This function assumes that \code{d} are a vector of KEDS/TABARI output files.
 ##' These are assumed to be tab separated text files wherein the
 ##' first field is a date in \code{yymmdd} format or as specified by \code{date.format}, 
 ##' the second and third fields are actor
@@ -120,41 +156,10 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
 ##' @return An event data set
 ##' @export
 ##' @author Will Lowe
-read_keds <- function(d, keep.quote=FALSE, keep.label=TRUE, one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d"){ 
-
-  read_keds_file <- function(dd){
-    read.csv(dd, sep='\t', head=FALSE, 
-             col.names=c('date', 'source', 'target', 'code', 'label', 'quote'),
-             colClasses=c("character", "factor", "factor", "character", "character"))    
-  }
-
-  ff <- read_keds_file(d[1])
-  if (length(d)>1)
-    for (i in 2:length(d))
-      ff <- rbind(ff, read_keds_file(d[i]))
-
-  ## make dates dates
-  ff$date <- as.Date(as.character(ff$date), date.format)
-
-  if (!keep.quote)
-  	ff$quote <- NULL
-
-  if (!keep.label)
-  	ff$label <- NULL
-  
-  if (scrub.keds)
-  	ff <- scrub_keds(ff)
-  else
-        ff$code <- factor(ff$code) ## a side effect of scrub_keds
-
-  ## assert temporal order
-  ff <- ff[order(ff$date),]
-
-  if (one.a.day)
-  	ff <- one_a_day(ff)
-  
-  class(ff) <- c("eventdata", class(ff))
-  return(ff) 
+read_keds <- function(d, keep.quote=FALSE, keep.label=TRUE, one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d"){
+	form <- paste("DSTC", ifelse(keep.label, "L", ""), ifelse(keep.quote, "Q", ""), sep='')
+	read_eventdata(d, col.format=form, one.a.day=one.a.day, scrub.keds=scrub.keds, 
+	  date.format=date.format)	
 }
 
 ##' Tries to remove duplicate events
