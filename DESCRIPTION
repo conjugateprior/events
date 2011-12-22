@@ -12,3 +12,4 @@ Description: Stores, manipulates, aggregates and otherwise messes with event
 License: GPL
 Collate:
     'events.R'
+    'measurement.R'
