@@ -9,11 +9,7 @@
 \arguments{
   \item{d}{Names of event data files}
 
-  \item{keep.quote}{Whether this text field should be
-  retained}
-
-  \item{keep.label}{Whether the label for the event code
-  should be retained}
+  \item{col.format}{Format for columns in d (see details)}
 
   \item{one.a.day}{Whether to apply the duplicate event
   remover}
@@ -22,6 +18,10 @@
 
   \item{date.format}{How dates are represented in the
   orginal file}
+
+  \item{sep}{File separator}
+
+  \item{head}{Whether there is a header row in d}
 }
 \value{
   An event data set
@@ -37,15 +37,16 @@
   This function assumes that \code{d} is a vector of output
   files. These are assumed to be \code{sep}-separated text
   files.  The column ordering is given by the
-  \code{col.format} parameter: \itemize{ D the date field S
-  the source actor field T the target actor field C the
-  event code field L the event code label field (optional)
-  Q the quote field (optional) . (or anything not shown
-  above) an ignorable column } e.g. the defaul "D.STC"
-  format means that column 1 is the date, column 2 should
-  be ignored, column 3 is the source, column 4 is the
-  target, and column 5 is the event code.  The optional
-  quote and label column are not searched for.
+  \code{col.format} parameter: \itemize{ \item D the date
+  field \item S the source actor field \item T the target
+  actor field \item C the event code field \item L the
+  event code label field (optional) \item Q the quote field
+  (optional) \item . (or anything not shown above) an
+  ignorable column } e.g. the defaul "D.STC" format means
+  that column 1 is the date, column 2 should be ignored,
+  column 3 is the source, column 4 is the target, and
+  column 5 is the event code.  The optional quote and label
+  column are not searched for.
 
   The code plucks out just these columns, formats them
   appropriately and ignores everything else in the file.

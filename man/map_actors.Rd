@@ -20,8 +20,8 @@
   The function relabels actor codes according to the
   filter. The filter may either be a function that returns
   the new name of an event when handed the old one, or a
-  list with entries of the form: \code{lst[[newname]] =
-  c(oldname1, oldname2)}.
+  list structured like \code{list(fruit=c('tomato',
+  'orange'), veg=c('red pepper', 'carrot'))}.
 
   This function can also be used as a renaming function,
   but it is most useful when multiple codes should be

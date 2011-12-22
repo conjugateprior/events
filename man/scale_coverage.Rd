@@ -19,7 +19,7 @@
   Returns an array of event codes that occur in an event
   data set but are not assigned values by the scale.  These
   are the codes that will, in subsequent processing, be
-  assigned the scales default value.
+  assigned the scale's default value.
 }
 \author{
   Will Lowe

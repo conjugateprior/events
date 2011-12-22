@@ -46,13 +46,13 @@ scrub_keds <- function(edo){
 ##' These are assumed to be \code{sep}-separated text files.  The column
 ##' ordering is given by the \code{col.format} parameter:
 ##' \itemize{
-##' D the date field
-##' S the source actor field
-##' T the target actor field
-##' C the event code field
-##' L the event code label field (optional)
-##' Q the quote field (optional)
-##' . (or anything not shown above) an ignorable column
+##' \item D the date field
+##' \item S the source actor field
+##' \item T the target actor field
+##' \item C the event code field
+##' \item L the event code label field (optional)
+##' \item Q the quote field (optional)
+##' \item . (or anything not shown above) an ignorable column
 ##' }
 ##' e.g. the defaul "D.STC" format means that column 1 is the date, column 2 should be 
 ##' ignored, column 3 is the source, column 4 is the target, and column 5 is the event
@@ -65,11 +65,12 @@ scrub_keds <- function(edo){
 ##' 
 ##' @title Read event data files 
 ##' @param d Names of event data files
-##' @param keep.quote Whether this text field should be retained
-##' @param keep.label Whether the label for the event code should be retained
+##' @param col.format Format for columns in d (see details) 
 ##' @param one.a.day Whether to apply the duplicate event remover
 ##' @param scrub.keds Whether to apply the data cleaner
 ##' @param date.format How dates are represented in the orginal file
+##' @param sep File separator
+##' @param head Whether there is a header row in d
 ##' @return An event data set
 ##' @export
 ##' @author Will Lowe
@@ -400,8 +401,8 @@ make_fun_from_list <- function(lst){
 ##'
 ##' The function relabels actor codes according to the filter.
 ##' The filter may either be a function that returns the new name
-##' of an event when handed the old one, or a list with entries of the
-##' form: \code{lst[[newname]] = c(oldname1, oldname2)}.
+##' of an event when handed the old one, or a list structured like
+##' \code{list(fruit=c('tomato', 'orange'), veg=c('red pepper', 'carrot'))}.
 ##'
 ##' This function can also be used as a renaming function, but it is most
 ##' useful when multiple codes should be treated as equivalent.
