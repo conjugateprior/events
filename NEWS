@@ -1,0 +1,17 @@
+events 0.5
+----------
+
+ * Made read_keds a special case of read_eventdata, a general purpose event data data reading function
+
+ * read_keds now reads multiple output files
+
+ * now bundles CAMEO codes and conflict-cooperation scores
+
+events 0.4 
+----------
+
+ * introduced underscore functions because we like python and we now can
+
+ * count data output now possible with dyad function
+
+ * now has tests for most functions using test_that
