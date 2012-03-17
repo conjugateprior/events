@@ -16,5 +16,5 @@
   \url{http://web.ku.edu/~keds/data.dir/balk.html}
 }
 \keyword{data}
-\keyword{dataset}
+\keyword{datasets}
 

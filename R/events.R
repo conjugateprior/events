@@ -1,17 +1,54 @@
-##' Hands back a function to spot the items it was given in (\code{...})
+##' Creates spotter function
 ##'
-##' This is a convenience function for creates a function that returns
-##' true for exact matches to its arguments.
-##' 
-##' @title Make a spotting function
-##' @param ... The items for which the new function should return \code{TRUE}
-##' @return A function 
+##' This is a convenience function that creates and returns a function which returns
+##' TRUE when any of its arguments match one of the patterns given here. 
+##' When \code{re} is TRUE,
+##' arguments to this function are matched as regular expressions in the returned 
+##' function using the base R function \code{grepl} with its default parameters.  
+##' These currently imply no PERL-style regexps,
+##' case sensitivity, and character rather than byte-based matching.
+##' When \code{re} is FALSE any exact match is sufficient for the returned function
+##' to return TRUE.  
+##'
+##' @title Make a spotter function
+##' @param ... Patterns, matches to which the returned function should return \code{TRUE}
+##' @return A spotter function 
 ##' @export
 ##' @author Will Lowe
-spotter <- function(...){
+spotter <- function(..., re=TRUE){
   lst <- unlist(list(...))
-  f <- function(x){x %in% lst}
+  if (re){
+    f <- function(x){ any(sapply(lst, function(p){ grepl(p, x) })) } 
+  } else {
+    f <- function(x){ x %in% lst }
+  }
   return(f)
+}
+
+##' Tests the coverage of a spotter function
+##'
+##' This is a test function to runs a spotter function over a set of strings
+##' and reports which strings are spotted and which are not.  It's mostly useful
+##' to ensure that any regular expressions given to \code{spotter} (i.e. when
+##' re=TRUE) have the 
+##' right coverage before using the spotter function to select events from your data.
+##' 
+##' @title Test spotter function coverage
+##' @param spotter a spotter function
+##' @param data a vector of character test data
+##' @param unspotted whether to also list strings to which the spotter returns FALSE
+##' @return the elements of \code{data} that the spotter spots, i.e. returns TRUE to, and
+##'         also optionally the elements which the spotter ignores, i.e. returns FALSE to.
+##' @export
+##' @author Will Lowe
+test_spotter <- function(spotter, data, unspotted=TRUE){
+  sp <- sapply(data, spotter)
+  spotted <- data[sp]
+  notspotted <- data[!sp]
+
+  cat("Spots:   ", paste(spotted[order(spotted)]), "\n")
+  if (unspotted)
+    cat("Ignores: ", paste(notspotted[order(notspotted)]), "\n") 
 }
 
 ##' Removes well-known noise from KEDS output files

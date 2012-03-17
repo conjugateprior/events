@@ -17,5 +17,5 @@
   \url{http://web.ku.edu/~keds/}
 }
 \keyword{data}
-\keyword{dataset}
+\keyword{datasets}
 
