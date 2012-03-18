@@ -2,7 +2,7 @@
 \alias{spotter}
 \title{Make a spotter function}
 \usage{
-  spotter(..., re = TRUE)
+  spotter(..., re = FALSE)
 }
 \arguments{
   \item{...}{Patterns, matches to which the returned

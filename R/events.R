@@ -1,3 +1,100 @@
+##' Creates mapper function
+##'
+##' This function creates and returns a function which renames
+##' arguments or returns them unchanged if no mapping is provided.  
+##' The function is initialised using a list describing the reverse mapping.  For example, 
+##' given \code{list(a=c(1,2), b=3)} a function is returned that turns 1 and 2 in 'a', 
+##' 3 into 'b' and leaves all other arguments unchanged.  
+##' When \code{re} is TRUE,
+##' name values are treated as regular expressions.  In the returned 
+##' function the base R function \code{grepl} is used to find the first
+##' matching argument.  It has its default parameters: no PERL-style regexps,
+##' case sensitivity, and character rather than byte-based matching.
+##' When \code{re} is FALSE only exact matches trigger the mapping.
+##'
+##' @title Make a mapper function
+##' @param lst A list of string to pattern associations
+##' @return A mapper function 
+##' @export
+##' @author Will Lowe
+mapper <- function(lst, re=FALSE){
+  f <- make_fun_from_list(lst, re=re)
+  return(f)
+}
+
+##' Creates a mapping function from list
+##'
+##' Turns a list of the form \code{list(a=c(1,2), b=3)} into a function
+##' that returns 'a' when given 1 or 2 as argument, 'b' when given 3
+##' and otherwise gives back its argument unchanged.  Name values are
+##' treated as regular expressions if \code{re}=TRUE.
+##'
+##' This is a convenience function to make it possible to specify onto mappings
+##' using lists.  The \code{mapper} uses it internally, 
+##' but you might find a use for it too.
+##' 
+##' @title Create a mapping function from list
+##' @param lst A list
+##' @param re Whether to interpret the name values as regular expressions
+##' @return A function that inverts the mapping specified by \code{lst}
+##' @author Will Lowe
+make_fun_from_list <- function(lst, re=FALSE){
+  revf <- list() ## reverse this list to do look ups the other way
+  for (newname in names(lst)){
+    newname.lst <- lst[[newname]]
+    for (n in newname.lst)
+      revf[[n]] <- newname
+  }
+  if (!re){
+     f <- function(x){ 
+       if (x %in% names(revf)) 
+       	  return(revf[[x]])
+       else
+          return(x) 
+     }
+  } else {
+     f <- function(x){
+       for (p in names(revf)){
+       	   if (grepl(p, x))
+	      return(revf[[ p ]])
+       }
+       return(x)
+     }
+  }	
+  return(f)
+}
+
+##' Tests the behaviour of a mapper function
+##'
+##' This is a test function to runs a mapper function over a set of strings
+##' and reports which strings are mapped and what they are mapped to.  It's mostly useful
+##' to ensure that any regular expressions given to \code{mapper} (i.e. when
+##' re=TRUE) have the 
+##' right behaviour before using the mapper function to aggregate things from your data.
+##' 
+##' @title Test mapper function behaviour
+##' @param mapper a mapper function
+##' @param data a vector of character test data
+##' @return What the elements of \code{data} are mapped to, if anything
+##' @export
+##' @author Will Lowe
+test_mapper <- function(mapper, data){
+  sp <- sapply(data, mapper)
+  unmapped <- sp==data
+  mapped <- sp!=data
+
+  mp <- list()
+  nms <- unique(sp[mapped])
+  cat("Mapped:\n")
+  for (n in nms){
+    middle <- paste(as.vector(data[mapped][sp[mapped]==n]), collapse=", ")
+    cat(paste("\t", middle, " --> ", n, "\n", sep=""))
+  }
+
+  cat(paste("Unmapped:\n\t", paste(data[unmapped], collapse=", "), sep="")) 
+}
+
+
 ##' Creates spotter function
 ##'
 ##' This is a convenience function that creates and returns a function which returns
@@ -15,7 +112,7 @@
 ##' @return A spotter function 
 ##' @export
 ##' @author Will Lowe
-spotter <- function(..., re=TRUE){
+spotter <- function(..., re=FALSE){
   lst <- unlist(list(...))
   if (re){
     f <- function(x){ any(sapply(lst, function(p){ grepl(p, x) })) } 
@@ -253,7 +350,7 @@ summary.eventdata <- function(object, ...){
 ##' 
 ##' @title Filter events data
 ##' @param edo Events data object
-##' @param fun Function that shoudl be applied 
+##' @param fun Function that should be applied 
 ##' @param which Which field should be filtered
 ##' @return Event data
 ##' @author Will Lowe
@@ -381,82 +478,41 @@ codes <- function(edo){
 ##' Aggregates event codes
 ##'
 ##' This function relabels event codes according to \code{fun},
-##' which may either be a function that returns the new name
-##' of an event when handed the old one, or a list with entries of the
-##' form: \code{lst[[newname]] = c(oldname1, oldname2)}.
+##' The \code{mapper} function is an easy way to make such a function.
 ##'
-##' It can also be used as a renaming function, but it is most
+##' This can also be used as a renaming function, but it is most
 ##' useful when multiple codes should be treated as equivalent.
 ##' 
 ##' @title Aggregate event codes 
 ##' @param edo Event data
-##' @param fun Function or list specifying the aggregation mapping
+##' @param fun Function specifying the aggregation mapping 
 ##' @return Event data with new event codes
 ##' @seealso \code{\link{map_actors}}
 ##' @export
 ##' @author Will Lowe
 map_codes <- function(edo, fun=function(x){return(x)}){
-  if (is.list(fun))
-    fun <- make_fun_from_list(fun)
-  
   cde <- sapply(as.character(edo$code), fun)
   edo$code <- factor(cde)
   return(edo)
 }
 
-##' Creates a mapping function from list
-##'
-##' Turns a list of the form \code{list(a=c(1,2), b=3)} into a function
-##' that returns 'a' when given 1 or 2 as argument, 'b' when given 3
-##' and otherwise gives back its argument unchanged.
-##'
-##' This is a convenience function to make it possible to specify onto mappings
-##' using lists.  The \code{map_*} functions use it internally, but you might find a 
-##' a use for it.
-##' 
-##' @title Create a mapping function from list
-##' @param lst A list
-##' @return A function that inverts the mapping specified by \code{lst}
-##' @author Will Lowe
-make_fun_from_list <- function(lst){
-  revf <- list() ## reverse this list to do look ups the otherway
-  for (newname in names(lst)){
-    newname.lst <- lst[[newname]]
-    for (n in newname.lst)
-      revf[[n]] <- newname
-  }
-  f <- function(x){ 
-    if (x %in% names(revf)) 
-      return(revf[[x]])
-    else
-      return(x) 
-  }	
-  return(f)
-}
-
 ##' Aggregates actor codes
 ##'
-##' The function relabels actor codes according to the filter.
-##' The filter may either be a function that returns the new name
-##' of an event when handed the old one, or a list structured like
-##' \code{list(fruit=c('tomato', 'orange'), veg=c('red pepper', 'carrot'))}.
+##' The function relabels actor codes according to \code{fun}.
+##' \code{mapper} provides an easy way to make a function specifying
+##' what things should now be called.
 ##'
 ##' This function can also be used as a renaming function, but it is most
 ##' useful when multiple codes should be treated as equivalent.
 ##' 
 ##' @title Aggregate actor codes 
 ##' @param edo Event data
-##' @param fun Function or list specifying the aggregation mapping
+##' @param fun Function specifying the aggregation mapping
 ##' @return Event data with new actor codes
 ##' @seealso \code{\link{map_codes}}
 ##' @export
 ##' @author Will Lowe
 map_actors <- function(edo, fun=function(x){return(x)}){
-
-  ## make a filter function from a list
-  if (is.list(fun))
-    fun <- make_fun_from_list(fun)
-  
   trg <- sapply(as.character(edo$target), fun)
   src <- sapply(as.character(edo$source), fun)
   edo$target <- factor(trg)

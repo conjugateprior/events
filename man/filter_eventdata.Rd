@@ -7,7 +7,7 @@
 \arguments{
   \item{edo}{Events data object}
 
-  \item{fun}{Function that shoudl be applied}
+  \item{fun}{Function that should be applied}
 
   \item{which}{Which field should be filtered}
 }
