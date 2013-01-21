@@ -4,7 +4,7 @@
 \usage{
   read_eventdata(d, col.format = "D.STC", one.a.day = TRUE,
     scrub.keds = TRUE, date.format = "\%y\%m\%d",
-    sep = "\t", head = FALSE)
+    sep = "\t", header = FALSE)
 }
 \arguments{
   \item{d}{Names of event data files}
@@ -21,7 +21,7 @@
 
   \item{sep}{File separator}
 
-  \item{head}{Whether there is a header row in d}
+  \item{header}{Whether there is a header row in d}
 }
 \value{
   An event data set

@@ -7,6 +7,9 @@
 \arguments{
   \item{...}{Patterns, matches to which the returned
   function should return \code{TRUE}}
+
+  \item{re}{whether to treat the patterns as regular
+  expressions}
 }
 \value{
   A spotter function

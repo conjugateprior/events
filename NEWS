@@ -1,3 +1,9 @@
+events 0.6
+----------
+
+* switched to strings rather than endlessly recreated factors
+
+
 events 0.5
 ----------
 

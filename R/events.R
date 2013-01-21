@@ -14,6 +14,7 @@
 ##'
 ##' @title Make a mapper function
 ##' @param lst A list of string to pattern associations
+##' @param re whether to treat the patterns as regular expressions
 ##' @return A mapper function 
 ##' @export
 ##' @author Will Lowe
@@ -37,6 +38,7 @@ mapper <- function(lst, re=FALSE){
 ##' @param lst A list
 ##' @param re Whether to interpret the name values as regular expressions
 ##' @return A function that inverts the mapping specified by \code{lst}
+##' @export
 ##' @author Will Lowe
 make_fun_from_list <- function(lst, re=FALSE){
   revf <- list() ## reverse this list to do look ups the other way
@@ -109,6 +111,7 @@ test_mapper <- function(mapper, data){
 ##'
 ##' @title Make a spotter function
 ##' @param ... Patterns, matches to which the returned function should return \code{TRUE}
+##' @param re whether to treat the patterns as regular expressions
 ##' @return A spotter function 
 ##' @export
 ##' @author Will Lowe
@@ -167,7 +170,7 @@ scrub_keds <- function(edo){
   edo$code <- sub('l(\\d\\d)$', '1\\1', edo$code, perl=TRUE)
   good <- grep('^.*---].*$', edo$code, invert=TRUE)
   edo <- edo[good,]
-  edo$code <- factor(edo$code)
+  ## edo$code <- factor(edo$code)
   return(edo)
 }
 
@@ -204,11 +207,11 @@ scrub_keds <- function(edo){
 ##' @param scrub.keds Whether to apply the data cleaner
 ##' @param date.format How dates are represented in the orginal file
 ##' @param sep File separator
-##' @param head Whether there is a header row in d
+##' @param header Whether there is a header row in d
 ##' @return An event data set
 ##' @export
 ##' @author Will Lowe
-read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d", sep='\t', head=FALSE){
+read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRUE, date.format="%y%m%d", sep='\t', header=FALSE){
 
   which.letter <- function(l, s){
      res <- grep(l, unlist(strsplit(s, '')))
@@ -231,11 +234,11 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
   quote.col <- which.letter('Q', col.format)
 
   read_ed_file <- function(d){
-    vv <- read.csv(d, sep=sep, head=head, strip.white=TRUE, colClasses="character")
+    vv <- read.csv(d, sep=sep, header=header, strip.white=TRUE, colClasses="character")
     dd <- data.frame(date=vv[,date.col], 
-                     source=factor(vv[,source.col]), 
-                     target=factor(vv[,target.col]),
-                     code=factor(vv[,code.col]))
+                     source=vv[,source.col], 
+                     target=vv[,target.col],
+                     code=vv[,code.col])
     if (label.col != -1)
       dd$label <- vv[,label.col]
     if (quote.col != -1)
@@ -253,8 +256,8 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
 
   if (scrub.keds)
   	ff <- scrub_keds(ff)
-  else
-    ff$code <- factor(ff$code) ## a side effect of scrub_keds
+  ## else
+    ##ff$code <- factor(ff$code) ## a side effect of scrub_keds
 
   ## assert temporal order
   ff <- ff[order(ff$date),]
@@ -359,7 +362,7 @@ filter_eventdata <- function(edo, fun, which){
   keep <- which(sapply(as.character(edo[[which]]), fun))
   d <- edo[keep,]
   ## remove unused levels
-  d[[which]] <- factor(as.character(d[[which]]))
+  d[[which]] <- as.character(d[[which]])
   return(d)
 }
 
@@ -491,8 +494,9 @@ codes <- function(edo){
 ##' @export
 ##' @author Will Lowe
 map_codes <- function(edo, fun=function(x){return(x)}){
-  cde <- sapply(as.character(edo$code), fun)
-  edo$code <- factor(cde)
+  if (!is.function(fun))
+    fun <- mapper(fun)
+  edo$code <- sapply(as.character(edo$code), fun)
   return(edo)
 }
 
@@ -513,10 +517,10 @@ map_codes <- function(edo, fun=function(x){return(x)}){
 ##' @export
 ##' @author Will Lowe
 map_actors <- function(edo, fun=function(x){return(x)}){
-  trg <- sapply(as.character(edo$target), fun)
-  src <- sapply(as.character(edo$source), fun)
-  edo$target <- factor(trg)
-  edo$source <- factor(src)
+  if (!is.function(fun))
+    fun <- mapper(fun)
+  edo$target <- sapply(as.character(edo$target), fun)
+  edo$source <- sapply(as.character(edo$source), fun)
   return(edo)
 }
 
@@ -676,8 +680,8 @@ make_scale <- function(name, types=NULL, values=NULL, file=NULL, desc="", defaul
 ##' @export
 ##' @author Will Lowe
 score <- function(eventscale, codes){
-  if (is.factor(codes))
-    codes <- as.character(codes) 
+  ##if (is.factor(codes))
+  ##  codes <- as.character(codes) 
 
   def <- attr(eventscale, 'default')
   ## seem to need to do this so NAs are not dropped

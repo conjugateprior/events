@@ -6,6 +6,9 @@
 }
 \arguments{
   \item{lst}{A list of string to pattern associations}
+
+  \item{re}{whether to treat the patterns as regular
+  expressions}
 }
 \value{
   A mapper function
