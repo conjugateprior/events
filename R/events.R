@@ -234,7 +234,7 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
   quote.col <- which.letter('Q', col.format)
 
   read_ed_file <- function(d){
-    vv <- read.csv(d, sep=sep, header=header, strip.white=TRUE, colClasses="character")
+    vv <- read.csv(d, sep=sep, header=header, strip.white=TRUE, colClasses='character')
     dd <- data.frame(date=vv[,date.col], 
                      source=vv[,source.col], 
                      target=vv[,target.col],
@@ -264,6 +264,10 @@ read_eventdata <- function(d, col.format="D.STC", one.a.day=TRUE, scrub.keds=TRU
 
   if (one.a.day)
   	ff <- one_a_day(ff)
+  
+  ff$source <- as.character(ff$source)
+  ff$target <- as.character(ff$target)
+  ff$code <- as.character(ff$code)
   
   class(ff) <- c("eventdata", class(ff))
   return(ff)   
@@ -358,11 +362,8 @@ summary.eventdata <- function(object, ...){
 ##' @return Event data
 ##' @author Will Lowe
 filter_eventdata <- function(edo, fun, which){
-  ## note the switch to character format
-  keep <- which(sapply(as.character(edo[[which]]), fun))
+  keep <- which(sapply(edo[[which]], fun))
   d <- edo[keep,]
-  ## remove unused levels
-  d[[which]] <- as.character(d[[which]])
   return(d)
 }
 
@@ -478,6 +479,27 @@ codes <- function(edo){
   sort(unique(as.character(edo$code)))
 }
 
+##' Aggregates event data fields
+##'
+##' This function applies a mapping/aggregration function to event data.
+##' It is the workhorse function behind the \code{map_} functions.
+##' You should use these in ordinary use.
+##'
+##' @title Aggregate field values 
+##' @param edo Event data
+##' @param fun Function specifying the aggregation mapping
+##' @param which Name of the field to map
+##' @return Event data with new fields
+##' @seealso \code{\link{map_codes}}, \code{\link{map_actors}}
+##' @export
+##' @author Will Lowe
+map_eventdata <- function(edo, fun, which){
+  if (!is.function(fun))
+    fun <- mapper(fun)
+  edo[[which]] <- sapply(edo[[which]], fun)
+  return(edo)
+}
+
 ##' Aggregates event codes
 ##'
 ##' This function relabels event codes according to \code{fun},
@@ -494,10 +516,7 @@ codes <- function(edo){
 ##' @export
 ##' @author Will Lowe
 map_codes <- function(edo, fun=function(x){return(x)}){
-  if (!is.function(fun))
-    fun <- mapper(fun)
-  edo$code <- sapply(as.character(edo$code), fun)
-  return(edo)
+  map_eventdata(edo, fun, 'code')
 }
 
 ##' Aggregates actor codes
@@ -517,11 +536,7 @@ map_codes <- function(edo, fun=function(x){return(x)}){
 ##' @export
 ##' @author Will Lowe
 map_actors <- function(edo, fun=function(x){return(x)}){
-  if (!is.function(fun))
-    fun <- mapper(fun)
-  edo$target <- sapply(as.character(edo$target), fun)
-  edo$source <- sapply(as.character(edo$source), fun)
-  return(edo)
+  map_eventdata(map_eventdata(edo, fun, 'source'), fun, 'target')
 }
 
 ##' Aggregates events to a regular time interval

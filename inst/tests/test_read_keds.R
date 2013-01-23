@@ -15,9 +15,9 @@ test_that("read_keds works without one a day", {
   expect_equal(nrow(dd), 77)
   expect_that(dd, is_a('eventdata'))
   expect_that(dd$date, is_a('Date'))
-  expect_that(dd$source, is_a('factor'))
-  expect_that(dd$target, is_a('factor'))
-  expect_that(dd$code, is_a('factor'))
+  expect_that(dd$source, is_a('character'))
+  expect_that(dd$target, is_a('character'))
+  expect_that(dd$code, is_a('character'))
 
   expect_identical(actors(dd), acts)
   expect_identical(sources(dd), srcs)
@@ -27,14 +27,14 @@ test_that("read_keds works without one a day", {
   expect_identical(dd$date[length(dd$date)], as.Date("1995-01-19"))
 })
 
-test_that("read_keds works with with one a day", {
+test_that("read_keds works with one a day", {
   dd <- read_keds('./tabari-demo.keds')
   expect_equal(nrow(dd), 66) ## duplicates removed
   expect_that(dd, is_a('eventdata'))
   expect_that(dd$date, is_a('Date'))
-  expect_that(dd$source, is_a('factor'))
-  expect_that(dd$target, is_a('factor'))
-  expect_that(dd$code, is_a('factor'))
+  expect_that(dd$source, is_a('character'))
+  expect_that(dd$target, is_a('character'))
+  expect_that(dd$code, is_a('character'))
 
   expect_identical(actors(dd), acts)
   expect_identical(sources(dd), srcs)
