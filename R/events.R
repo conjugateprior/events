@@ -47,24 +47,32 @@ make_fun_from_list <- function(lst, re=FALSE){
     for (n in newname.lst)
       revf[[n]] <- newname
   }
+  print(revf)
+  
   if (!re){
      f <- function(x){ 
-       if (x %in% names(revf)) 
-       	  return(revf[[x]])
-       else
-          return(x) 
+       find_in_list <- function(z){ 
+         if (z %in% names(revf)) 
+           revf[[z]]
+         else
+           z
+       } 
+       unlist(lapply(x, find_in_list))
      }
   } else {
      f <- function(x){
-       for (p in names(revf)){
-       	   if (grepl(p, x))
-	      return(revf[[ p ]])
-       }
-       return(x)
+       find_in_list_re <- function(z){
+         for (n in names(revf))
+           if (grepl(n, z))
+             return(revf[[ n ]])
+         return(z)
+       } 
+       unlist(lapply(x, find_in_list_re))
      }
   }	
-  return(f)
+  f
 }
+
 
 ##' Tests the behaviour of a mapper function
 ##'
@@ -118,12 +126,19 @@ test_mapper <- function(mapper, data){
 spotter <- function(..., re=FALSE){
   lst <- unlist(list(...))
   if (re){
-    f <- function(x){ any(sapply(lst, function(p){ grepl(p, x) })) } 
+    f <- function(x){ 
+      find_in_list_re <- function(z){ any(unlist(lapply(lst, grepl, x=z))) } 
+      unlist(lapply(x, find_in_list_re))
+    }
   } else {
-    f <- function(x){ x %in% lst }
+    f <- function(x){ 
+      find_in_list <- function(z){ z %in% lst } 
+      unlist(lapply(x, find_in_list)) 
+    }
   }
   return(f)
 }
+
 
 ##' Tests the coverage of a spotter function
 ##'
@@ -349,32 +364,14 @@ summary.eventdata <- function(object, ...){
   cat(paste("from", start, "to", end, "\n"))
 }
 
-##' Applies a generic field filter to event data
-##'
-##' This function applies a filter function to event data.
-##' It is the workhorse function behind the \code{filter_} functions.
-##' You should use these in ordinary use.
-##' 
-##' @title Filter events data
-##' @param edo Events data object
-##' @param fun Function that should be applied 
-##' @param which Which field should be filtered
-##' @return Event data
-##' @author Will Lowe
-filter_eventdata <- function(edo, fun, which){
-  keep <- which(sapply(edo[[which]], fun))
-  d <- edo[keep,]
-  return(d)
-}
-
 ##' Discards all but relevant actors
 ##'
 ##' The \code{which} parameter specifies whether the filter should be applied
 ##' only to targets, only to sources, or to all actors in the event data.
 ##' 
-##' @title Discard all but elevant actors 
+##' @title Discard all but relevant actors 
 ##' @param edo Event data
-##' @param fun Function that returns \code{TRUE} for actor codes that should not be discarded.
+##' @param fun Function that returns \code{TRUE} for actor codes or a single actor code, that should not be discarded.
 ##' @param which What actor roles should be filtered
 ##' @return Event data containing only actors that pass through \code{fun}
 ##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}
@@ -382,13 +379,44 @@ filter_eventdata <- function(edo, fun, which){
 ##' @author Will Lowe
 filter_actors <- function(edo, fun=function(x){return(TRUE)}, which=c('both','target','source')){
   wh <- match.arg(which)
+  if (is.character(fun)) ## if they just passed in a raw name
+    FUN <- function(x){ x==fun }
+  else
+    FUN <- fun
+  
   if (wh=='both')
-    d <- filter_eventdata(filter_eventdata(edo, fun, 'target'), fun, 'source')
+    filter(edo, FUN(target) | FUN(source))
   else if (wh=='target')
-    d <- filter_eventdata(edo, fun, 'target')
+    filter(edo, FUN(target))
   else if (wh=='source')
-    d <- filter_eventdata(edo, fun, 'source')
-  return (d)
+    filter(edo, FUN(source))  
+}
+
+
+##' Extracts a directed dyad
+##'
+##' The \code{source} parameter identifies sources and the \code{target} parameter specifies 
+##' the target names.
+##' 
+##' @title Discard all but relevant actors 
+##' @param edo Event data
+##' @param source Function that returns \code{TRUE} for source actor codes, or actor name.
+##' @param target Function that returns \code{TRUE} for target actor codes, or actor name.
+##' @return All events in which one of the sources does something to one of the targets
+##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}, \code{\link{filter_actors}}
+##' @export
+##' @author Will Lowe
+filter_dyad <- function(edo, source=function(x){return(TRUE)}, target=function(x){return(TRUE)}){
+  if (is.character(source))
+    sourceFUN <- function(x){ x==source }
+  else
+    sourceFUN <- source
+  if (is.character(target))
+    targetFUN <- function(x){ x==target }
+  else
+    targetFUN <- target
+
+  filter(edo, sourceFUN(source), targetFUN(target))
 }
 
 ##' Discards all but relevant event codes
@@ -398,14 +426,18 @@ filter_actors <- function(edo, fun=function(x){return(TRUE)}, which=c('both','ta
 ##' 
 ##' @title Discard all but relevant event codes
 ##' @param edo Event data
-##' @param fun Function that returns \code{TRUE} or event codes that should not be discarded
+##' @param fun Function that returns \code{TRUE} for event codes, or single event code, that should not be discarded
 ##' @return Event data containing only events that pass through \code{fun}
 ##' @seealso \code{\link{filter_actors}}, \code{\link{filter_time}}
 ##' @export
 ##' @author Will Lowe
 filter_codes <- function(edo, fun=function(x){return(TRUE)}){
-  d <- filter_eventdata(edo, fun, 'code')
-  return (d)
+  if (is.character(fun))
+    codeFUN <- function(x){ x==fun }
+  else
+    codeFUN <- fun
+  
+  filter(edo, codeFUN(code))
 }
 
 ##' Restricts events to a time period
@@ -422,7 +454,7 @@ filter_codes <- function(edo, fun=function(x){return(TRUE)}){
 filter_time <- function(edo, start=min(edo$date), end=max(edo$date)){
   st <- as.Date(start)
   en <- as.Date(end)
-  edo[(edo$date >= st) & (edo$date <= en),]
+  filter(edo, date >= st & date <= en)
 }
 
 ##' Lists actor codes
@@ -487,7 +519,7 @@ codes <- function(edo){
 ##'
 ##' @title Aggregate field values 
 ##' @param edo Event data
-##' @param fun Function specifying the aggregation mapping
+##' @param fun Function specifying the aggregation mapping, or a list 
 ##' @param which Name of the field to map
 ##' @return Event data with new fields
 ##' @seealso \code{\link{map_codes}}, \code{\link{map_actors}}
