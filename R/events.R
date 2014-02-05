@@ -15,64 +15,46 @@
 ##' @title Make a mapper function
 ##' @param lst A list of string to pattern associations
 ##' @param re whether to treat the patterns as regular expressions
+##' @param unmatched what to return if there is no mapping (default NULL returns the original value) 
 ##' @return A mapper function 
 ##' @export
 ##' @author Will Lowe
-mapper <- function(lst, re=FALSE){
-  f <- make_fun_from_list(lst, re=re)
-  return(f)
-}
-
-##' Creates a mapping function from list
-##'
-##' Turns a list of the form \code{list(a=c(1,2), b=3)} into a function
-##' that returns 'a' when given 1 or 2 as argument, 'b' when given 3
-##' and otherwise gives back its argument unchanged.  Name values are
-##' treated as regular expressions if \code{re}=TRUE.
-##'
-##' This is a convenience function to make it possible to specify onto mappings
-##' using lists.  The \code{mapper} uses it internally, 
-##' but you might find a use for it too.
-##' 
-##' @title Create a mapping function from list
-##' @param lst A list
-##' @param re Whether to interpret the name values as regular expressions
-##' @return A function that inverts the mapping specified by \code{lst}
-##' @export
-##' @author Will Lowe
-make_fun_from_list <- function(lst, re=FALSE){
+mapper <- function(lst, re=FALSE, unmatched=NULL){
   revf <- list() ## reverse this list to do look ups the other way
   for (newname in names(lst)){
     newname.lst <- lst[[newname]]
     for (n in newname.lst)
       revf[[n]] <- newname
   }
-  print(revf)
-  
-  if (!re){
-     f <- function(x){ 
-       find_in_list <- function(z){ 
-         if (z %in% names(revf)) 
-           revf[[z]]
-         else
-           z
-       } 
-       unlist(lapply(x, find_in_list))
-     }
-  } else {
-     f <- function(x){
-       find_in_list_re <- function(z){
-         for (n in names(revf))
-           if (grepl(n, z))
-             return(revf[[ n ]])
-         return(z)
-       } 
-       unlist(lapply(x, find_in_list_re))
-     }
-  }	
-  f
+  find_in_list <- function(z){ 
+    val <- revf[[ as.character(z) ]]
+    if (is.null(val)){
+      if (is.null(unmatched)) { 
+        return(as.character(z)) 
+      } else { 
+        return(unmatched) 
+      }
+    } else { 
+      return(val) 
+    }
+  }
+  find_in_list_re <- function(z){
+    mtchs <- sapply(names(revf), grepl, z)
+    if (any(mtchs)){
+      nme <- names(revf)[which(mtchs)[1]]
+      return(revf[[ nme ]])
+    } else {
+      if (is.null(unmatched))
+        return(as.character(z))
+      else
+        return(unmatched)
+    }
+  }
+  if (re)
+     function(x){ unlist(lapply(x, find_in_list_re)) }
+  else 
+     function(x){ unlist(lapply(x, find_in_list)) }
 }
-
 
 ##' Tests the behaviour of a mapper function
 ##'
@@ -92,13 +74,13 @@ test_mapper <- function(mapper, data){
   sp <- sapply(data, mapper)
   unmapped <- sp==data
   mapped <- sp!=data
-
+  
   mp <- list()
   nms <- unique(sp[mapped])
   cat("Mapped:\n")
   for (n in nms){
     middle <- paste(as.vector(data[mapped][sp[mapped]==n]), collapse=", ")
-    cat(paste("\t", middle, " --> ", n, "\n", sep=""))
+    cat(paste("\t", n, " <-- ", middle, "\n", sep=""))
   }
 
   cat(paste("Unmapped:\n\t", paste(data[unmapped], collapse=", "), sep="")) 
@@ -161,9 +143,9 @@ test_spotter <- function(spotter, data, unspotted=TRUE){
   spotted <- data[sp]
   notspotted <- data[!sp]
 
-  cat("Spots:   ", paste(spotted[order(spotted)]), "\n")
+  cat("Spotted:   ", paste(spotted[order(spotted)]), "\n")
   if (unspotted)
-    cat("Ignores: ", paste(notspotted[order(notspotted)]), "\n") 
+    cat("Ignored: ", paste(notspotted[order(notspotted)]), "\n") 
 }
 
 ##' Removes well-known noise from KEDS output files
@@ -548,7 +530,12 @@ map_eventdata <- function(edo, fun, which){
 ##' @export
 ##' @author Will Lowe
 map_codes <- function(edo, fun=function(x){return(x)}){
-  map_eventdata(edo, fun, 'code')
+  if (!is.function(fun))
+    fun <- mapper(fun)
+  mutate(edo, code=fun(code))
+  
+  #edo[[which]] <- sapply(edo[[which]], fun)
+  #map_eventdata(edo, fun, 'code')
 }
 
 ##' Aggregates actor codes
@@ -568,7 +555,11 @@ map_codes <- function(edo, fun=function(x){return(x)}){
 ##' @export
 ##' @author Will Lowe
 map_actors <- function(edo, fun=function(x){return(x)}){
-  map_eventdata(map_eventdata(edo, fun, 'source'), fun, 'target')
+  if (!is.function(fun))
+    fun <- mapper(fun)  
+  mutate(edo, source=fun(source), target=fun(target))
+  
+  #map_eventdata(map_eventdata(edo, fun, 'source'), fun, 'target')
 }
 
 ##' Aggregates events to a regular time interval
