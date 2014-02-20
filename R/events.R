@@ -583,16 +583,21 @@ map_actors <- function(edo, fun=function(x){return(x)}){
 ##' @return A list of named dyadic aggregated time series
 ##' @export
 ##' @author Will Lowe
-make_dyads <- function(edo, scale=NULL, unit=c('week','day','month','quarter','year'), monday=TRUE, fun=mean, missing.data=NA) {
+make_dyads <- function(edo, scale=NULL, unit=c('week','day','month','quarter','year'), monday=TRUE, fun=mean, se.fun=NULL, missing.data=NA) {
   
-  unit <- match.arg(unit)
-  segs <- cut(edo$date, breaks=unit, start.on.monday=monday)
-  segsd <- as.Date(levels(segs))
-  ## add the segs to edo before aggregating
-  edo$sEGs <- segs
-  evs <- codes(edo)
-  
+  unit <- match.arg(unit)  
+  edo$sEGs <- cut(edo$date, breaks=unit, start.on.monday=monday)
+
   ff <- function(a, b){
+    if (is.null(scale))
+      with(filter(edo, source==a, target==b), table(sEGs, code))
+    else {
+      arrange(summarise(group_by(bws, sEGs), m=mean(gold, na.rm=TRUE), v=var(gold, na.rm=TRUE), n=n()), sEGs)
+      
+      ## fix me !
+      summarise(group_by(filter(edo, source==a, target==b), sEGs), val=fun(scale), N=n())
+    }
+    
     edo.subset <- edo[edo$source==a & edo$target==b, ]
     if (nrow(edo.subset) == 0)
       return(NULL)
