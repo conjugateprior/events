@@ -583,67 +583,45 @@ map_actors <- function(edo, fun=function(x){return(x)}){
 ##' @return A list of named dyadic aggregated time series
 ##' @export
 ##' @author Will Lowe
-make_dyads <- function(edo, scale=NULL, unit=c('week','day','month','quarter','year'), monday=TRUE, fun=mean, se.fun=NULL, missing.data=NA) {
-  
+make_dyads <- function(edo, scale=NULL, 
+                       unit='week', monday=TRUE, 
+                       fun=function(x){ mean(x, na.rm=TRUE) }, 
+                       se.fun=function(x){ sqrt(var(x, na.rm=TRUE)/length(x)) }, 
+                       missing.data=NA, actors=NULL) {
   unit <- match.arg(unit)  
-  edo$sEGs <- cut(edo$date, breaks=unit, start.on.monday=monday)
-
-  ff <- function(a, b){
-    if (is.null(scale))
-      with(filter(edo, source==a, target==b), table(sEGs, code))
-    else {
-      arrange(summarise(group_by(bws, sEGs), m=mean(gold, na.rm=TRUE), v=var(gold, na.rm=TRUE), n=n()), sEGs)
-      
-      ## fix me !
-      summarise(group_by(filter(edo, source==a, target==b), sEGs), val=fun(scale), N=n())
-    }
+  ## Note: evenly spaced levels even when the data hasn't courtesy of cut.Date
+  temp.agg <- cut(edo$date, breaks=unit, start.on.monday=monday)
+  tstamps <- data.frame(date=levels(temp.agg)) ## for merging into
+  
+  edo <- mutate(edo, 
+                events.dyad=paste0(source, '.', target),
+                events.temp.unit=temp.agg)  
+  
+  if (!is.null(actors)) 
+    edo <- filter(edo, (source %in% actors) & (target %in% actors))
+  
+  if (is.null(scale)){
+    tabul <- function(env){ with(env, table(events.temp.unit, code)) }
+    ff <- lapply(split(edo, edo$events.dyad), tabul)
+  } else {
+    if (is.null(se.fun))
+      se.fun <- function(x){ missing.data }
+    edo$events.scale <- edo[[scale]] ## can't do this in mutate either weirdly
     
-    edo.subset <- edo[edo$source==a & edo$target==b, ]
-    if (nrow(edo.subset) == 0)
-      return(NULL)
-    
-    if (is.null(scale)){
-      ## this process 
-      rr <- as.matrix(with(edo.subset, table(sEGs, code)))
-      ret <- data.frame(date=segsd)
-      ## sometimes dyads just do not use some codes
-      for (e in evs){
-        if (e %in% colnames(rr))
-          ret[,e] <- rr[,e]
-        else
-          ret[,e] <- rep(0, nrow(rr))
-      }
-      
-    } else {
-      agg <- aggregate(edo.subset[[scale]], by=list(unit=edo.subset$sEGs), FUN=fun)
-      hh <- data.frame(date=as.Date(agg$unit))
-      hh[[scale]] <- agg$x
-      aggn <- aggregate(edo.subset[[scale]], by=list(unit=edo.subset$sEGs), FUN=length) ## to get N
-      hh$n <- aggn$x
-      ## fold into a proper timeline
-      ret <- data.frame(date=segsd)
-      ret <- merge(ret, hh, by='date', all.x=TRUE)
-      ret$n[is.na(ret$n)] <- 0
-      ## pad with zeros or something, if you must...
-      if (!is.na(missing.data))
-      	ret[[scale]][ret$n==0] <- missing.data
+    scale.func <- function(dyad){
+      dd <- dyad %.% 
+        group_by(events.temp.unit) %.% 
+        summarise(est=fun(events.scale), se=se.fun(events.scale), n=n()) %.% 
+        arrange(events.temp.unit)
+      colnames(dd)[1] <- "date"
+      dd <- merge(tstamps, dd, all.x=TRUE)
+      mutate(dd, 
+             n=ifelse(is.na(n), 0, n),
+             est=ifelse(is.na(est), missing.data, est))
     }
-    return(ret)
+    ff <- lapply(split(edo, edo$events.dyad), scale.func)
   }
-
-  res <- list()
-  act <- actors(edo)
-  for (a in act){
-    for (b in act){
-      val <- ff(a, b)
-      if (!is.null(scale))
-      	class(val) <- c('dyadic.aggregated.scaled.eventdata', class(val))
-      else
-      	class(val) <- c('dyadic.aggregated.count.eventdata', class(val))
-      res[[paste(a,b,sep='.')]] <- val
-    }
-  }    
-  return(res)  
+  ff
 }
 
 ##' Plots scaled directed dyad
@@ -655,11 +633,12 @@ make_dyads <- function(edo, scale=NULL, unit=c('week','day','month','quarter','y
 ##' @return Nothing, used for side effect
 ##' @export
 ##' @author Will Lowe
-plot_dyad <- function(dyad, ...){
-  stopifnot(is(dyad, 'dyadic.aggregated.scaled.eventdata'))
-  
-  scalename <- names(dyad)[which(!(names(dyad) %in% c("n", "date")))]
-  with(dyad, plot(dyad$date, dyad[[scalename]], ...))
+plot_dyad <- function(dyad, ci=FALSE, ...){
+  stopifnot('est' %in% names(dyad))
+  plot(dyad$date, dyad$est, ...)
+  lw <- dyad$est - 2*dyad$se
+  up <- dyad$est - 2*dyad$se
+  segments(x0=dyad$date, x1=dyad$date, y0=lw, y1=up, ...) ## I broked it
 }
 
 ##' Makes an event scale
