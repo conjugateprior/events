@@ -1,13 +1,12 @@
 Package: events
 Type: Package
 Title: Store and manipulate event data
-Version: 0.6
+Version: 0.7
 Date: 2013-01-21
 Author: Will Lowe
 Maintainer: Will Lowe <will.lowe@uni-mannheim.de>
 Depends:
-    R (>= 2.10)
-    dplyr
+    R (>= 2.10), dplyr
 Description: Stores, manipulates, aggregates and otherwise messes with event
     data from KEDS/TABARI or any other extraction tool with similar output
 License: GPL

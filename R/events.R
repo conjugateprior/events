@@ -346,27 +346,38 @@ summary.eventdata <- function(object, ...){
   cat(paste("from", start, "to", end, "\n"))
 }
 
-##' Discards all but relevant actors
+##' Filters out events not involving specified actors
 ##'
 ##' The \code{which} parameter specifies whether the filter should be applied
-##' only to targets, only to sources, or to all actors in the event data.
+##' only to actors in the target role, \code{'target'}, only to actors in the 
+##' source role, \code{'source'}, all actors in the event data, \code{'both'},
+##' or to any event having one of the specified actors in eithe rsource or target
+##' role, \code{'either'}.
 ##' 
-##' @title Discard all but relevant actors 
+##' \code{fun} can be specified as a function that returns true for particular actor names,
+##' or as a list of actor names to retain, or a single actor name.  The default \code{fun}
+##' and the default \code{which} settings return the event data unchanged. 
+##' 
+##' @title Filter out events that do not involve specified actors 
 ##' @param edo Event data
-##' @param fun Function that returns \code{TRUE} for actor codes or a single actor code, that should not be discarded.
-##' @param which What actor roles should be filtered
-##' @return Event data containing only actors that pass through \code{fun}
-##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}
+##' @param fun function that returns \code{TRUE} for actor names that should be retained, or a name, or a vector of names
+##' @param which Which actor roles should be filtered. Defaults to 'both' (\code{fun} must return true for source and target)
+##' @return Events involving only actors that pass through \code{fun}
+##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_dyad}}
 ##' @export
 ##' @author Will Lowe
-filter_actors <- function(edo, fun=function(x){return(TRUE)}, which=c('both','target','source')){
+filter_actors <- function(edo, fun=function(x){return(TRUE)}, which=c('both','target','source', 'either')){
   wh <- match.arg(which)
   if (is.character(fun)) ## if they just passed in a raw name
     FUN <- function(x){ x==fun }
+  else if (is.vector(fun)) ## or a vector of raw names
+    FUN <- function(x){ x %in% fun }
   else
     FUN <- fun
   
   if (wh=='both')
+    filter(edo, FUN(target) & FUN(source))
+  else if (wh=='either')
     filter(edo, FUN(target) | FUN(source))
   else if (wh=='target')
     filter(edo, FUN(target))
@@ -385,7 +396,7 @@ filter_actors <- function(edo, fun=function(x){return(TRUE)}, which=c('both','ta
 ##' @param source Function that returns \code{TRUE} for source actor codes, or actor name.
 ##' @param target Function that returns \code{TRUE} for target actor codes, or actor name.
 ##' @return All events in which one of the sources does something to one of the targets
-##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}, \code{\link{filter_actors}}
+##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_actors}}
 ##' @export
 ##' @author Will Lowe
 filter_dyad <- function(edo, source=function(x){return(TRUE)}, target=function(x){return(TRUE)}){
@@ -495,7 +506,7 @@ codes <- function(edo){
 
 ##' Aggregates event data fields
 ##'
-##' This function applies a mapping/aggregration function to event data.
+##' DEPRECATED This function applies a mapping/aggregration function to event data.
 ##' It is the workhorse function behind the \code{map_} functions.
 ##' You should use these in ordinary use.
 ##'
@@ -533,9 +544,6 @@ map_codes <- function(edo, fun=function(x){return(x)}){
   if (!is.function(fun))
     fun <- mapper(fun)
   mutate(edo, code=fun(code))
-  
-  #edo[[which]] <- sapply(edo[[which]], fun)
-  #map_eventdata(edo, fun, 'code')
 }
 
 ##' Aggregates actor codes
@@ -558,8 +566,6 @@ map_actors <- function(edo, fun=function(x){return(x)}){
   if (!is.function(fun))
     fun <- mapper(fun)  
   mutate(edo, source=fun(source), target=fun(target))
-  
-  #map_eventdata(map_eventdata(edo, fun, 'source'), fun, 'target')
 }
 
 ##' Aggregates events to a regular time interval
@@ -586,7 +592,7 @@ map_actors <- function(edo, fun=function(x){return(x)}){
 make_dyads <- function(edo, scale=NULL, 
                        unit='week', monday=TRUE, 
                        fun=function(x){ mean(x, na.rm=TRUE) }, 
-                       se.fun=function(x){ sqrt(var(x, na.rm=TRUE)/length(x)) }, 
+                       se.fun=NULL, 
                        missing.data=NA, actors=NULL) {
   unit <- match.arg(unit)  
   ## Note: evenly spaced levels even when the data hasn't courtesy of cut.Date
@@ -611,12 +617,12 @@ make_dyads <- function(edo, scale=NULL,
     scale.func <- function(dyad){
       dd <- dyad %.% 
         group_by(events.temp.unit) %.% 
-        summarise(est=fun(events.scale), se=se.fun(events.scale), n=n()) %.% 
+        summarise(est=fun(events.scale), se=se.fun(events.scale), N=n()) %.% 
         arrange(events.temp.unit)
       colnames(dd)[1] <- "date"
       dd <- merge(tstamps, dd, all.x=TRUE)
       mutate(dd, 
-             n=ifelse(is.na(n), 0, n),
+             N=ifelse(is.na(N), 0, N),
              est=ifelse(is.na(est), missing.data, est))
     }
     ff <- lapply(split(edo, edo$events.dyad), scale.func)
@@ -702,16 +708,17 @@ make_scale <- function(name, types=NULL, values=NULL, file=NULL, desc="", defaul
 ##' @export
 ##' @author Will Lowe
 score <- function(eventscale, codes){
-  ##if (is.factor(codes))
-  ##  codes <- as.character(codes) 
-
   def <- attr(eventscale, 'default')
   ## seem to need to do this so NAs are not dropped
-  dd <- sapply(codes, function(x){ 
-      ff <- eventscale[[x]] 
-      ifelse(is.null(ff), def, ff) 
-    })
-  return(as.numeric(dd))
+  ff <- function(x){ 
+    ff <- eventscale[[x]] 
+    if (is.null(ff))
+      def
+    else 
+      ff 
+  }
+  dd <- sapply(codes, ff)
+  return(as.numeric(dd)) ## do we need this as.numeric thing?
 }
 
 ##' Checks coverage of scale for event data
