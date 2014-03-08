@@ -572,12 +572,12 @@ map_actors <- function(edo, fun=function(x){return(x)}){
 ##'
 ##' In an event data set S, assume that \eqn{A}=\code{length(actors(S))} actors 
 ##' \eqn{K}=\code{length(codes(S))} event codes occur.  This function
-##' creates \eqn{A^2} data streams labelled by the combination of source and target
+##' creates (by default) \eqn{A^2} data streams labelled by the combination of source and target
 ##' actors.  If \code{scale} is \code{NULL} these are \eqn{K}-dimensional time series of event counts.
 ##' If \code{scale} names a scale that has been
 ##' added to the event data \code{fun} is used to aggregate the events falling into
-##' each temporal interval. This creates a univariate interval valued
-##' time series for each directed dyad.
+##' each temporal interval. This creates a evenly spaced univariate interval-valued
+##' time series, possibly with missing data, for each directed dyad.
 ##' 
 ##' @title Aggregate events to a regular time interval 
 ##' @param edo Event data
@@ -586,16 +586,16 @@ map_actors <- function(edo, fun=function(x){return(x)}){
 ##' @param monday Whether weeks start on Monday. If \code{FALSE}, they start on Sunday
 ##' @param fun Aggregation function.  Should take a vector and return a scalar
 ##' @param missing.data What weeks with no data are assigned
+##' @param actors An array of actor names from which to construct dyads. 
 ##' @return A list of named dyadic aggregated time series
 ##' @export
 ##' @author Will Lowe
 make_dyads <- function(edo, scale=NULL, 
                        unit='week', monday=TRUE, 
                        fun=function(x){ mean(x, na.rm=TRUE) }, 
-                       se.fun=NULL, 
                        missing.data=NA, actors=NULL) {
   unit <- match.arg(unit)  
-  ## Note: evenly spaced levels even when the data hasn't courtesy of cut.Date
+  ## Note: evenly spaced levels even when the data hasn't, courtesy of cut.Date
   temp.agg <- cut(edo$date, breaks=unit, start.on.monday=monday)
   tstamps <- data.frame(date=levels(temp.agg)) ## for merging into
   
@@ -610,14 +610,12 @@ make_dyads <- function(edo, scale=NULL,
     tabul <- function(env){ with(env, table(events.temp.unit, code)) }
     ff <- lapply(split(edo, edo$events.dyad), tabul)
   } else {
-    if (is.null(se.fun))
-      se.fun <- function(x){ missing.data }
-    edo$events.scale <- edo[[scale]] ## can't do this in mutate either weirdly
+    edo$events.scale <- edo[[scale]] ## can't do this in mutate either, weirdly
     
     scale.func <- function(dyad){
       dd <- dyad %.% 
         group_by(events.temp.unit) %.% 
-        summarise(est=fun(events.scale), se=se.fun(events.scale), N=n()) %.% 
+        summarise(est=fun(events.scale), N=n()) %.% 
         arrange(events.temp.unit)
       colnames(dd)[1] <- "date"
       dd <- merge(tstamps, dd, all.x=TRUE)
@@ -639,12 +637,9 @@ make_dyads <- function(edo, scale=NULL,
 ##' @return Nothing, used for side effect
 ##' @export
 ##' @author Will Lowe
-plot_dyad <- function(dyad, ci=FALSE, ...){
-  stopifnot('est' %in% names(dyad))
-  plot(dyad$date, dyad$est, ...)
-  lw <- dyad$est - 2*dyad$se
-  up <- dyad$est - 2*dyad$se
-  segments(x0=dyad$date, x1=dyad$date, y0=lw, y1=up, ...) ## I broked it
+plot_dyad <- function(dyad, ...){
+  gg <- as.xts(dyad$est, order.by=as.Date(dyad$date))
+  plot(gg, ..., main=NULL) 
 }
 
 ##' Makes an event scale
