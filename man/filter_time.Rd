@@ -19,7 +19,7 @@ Event data restricted to a time period
 Restricts events to a time period
 }
 \details{
-Restricts events on or after \code{start} and before or on
+Restricts events on or after \code{start} and on or before
 \code{end}.
 }
 \author{

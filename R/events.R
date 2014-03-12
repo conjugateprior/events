@@ -167,7 +167,6 @@ scrub_keds <- function(edo){
   edo$code <- sub('l(\\d\\d)$', '1\\1', edo$code, perl=TRUE)
   good <- grep('^.*---].*$', edo$code, invert=TRUE)
   edo <- edo[good,]
-  ## edo$code <- factor(edo$code)
   return(edo)
 }
 
@@ -193,7 +192,7 @@ scrub_keds <- function(edo){
 ##' code.  The optional quote and label column are not searched for.
 ##'
 ##' The code plucks out just these columns, formats them appropriately and ignores 
-##' everything else in the file.  Only D, S, T, C, and C are required.
+##' everything else in the file.  Only D, S, T, and C are required.
 ##'
 ##' The format of the date field is given by \code{format.date} 
 ##' 
@@ -346,7 +345,25 @@ summary.eventdata <- function(object, ...){
   cat(paste("from", start, "to", end, "\n"))
 }
 
-##' Filters out events not involving specified actors
+##' Prints out the first few events of an event data set
+##' 
+##' @title Show the first few events in an event data set 
+##' @param edo Event data
+##' @return Silently returns the event data set
+##' @export
+##' @author Will Lowe
+print.eventdata <- function(edo, ...){
+  n <- nrow(edo)
+  if (n > 6){
+    print.data.frame(edo[1:6,], row.names=FALSE)
+    cat(paste0(" ...\n [ ", n, " events ending in ", edo$date[n], " ]")) 
+  } else {
+    print.data.frame(edo)
+  }
+  invisible(edo)
+}
+
+##' Filters out events that do not involve specified actors
 ##'
 ##' The \code{which} parameter specifies whether the filter should be applied
 ##' only to actors in the target role, \code{'target'}, only to actors in the 
@@ -366,14 +383,14 @@ summary.eventdata <- function(object, ...){
 ##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_dyad}}
 ##' @export
 ##' @author Will Lowe
-filter_actors <- function(edo, fun=function(x){return(TRUE)}, which=c('both','target','source', 'either')){
+filter_actors <- function(edo, fun=function(x){TRUE}, 
+                          which=c('both','target','source', 'either')){
   wh <- match.arg(which)
-  if (is.character(fun)) ## if they just passed in a raw name
-    FUN <- function(x){ x==fun }
-  else if (is.vector(fun)) ## or a vector of raw names
-    FUN <- function(x){ x %in% fun }
-  else
+  if (is.character(fun)){
+    FUN <- spotter(fun)
+  } else {
     FUN <- fun
+  }
   
   if (wh=='both')
     filter(edo, FUN(target) & FUN(source))
@@ -393,22 +410,25 @@ filter_actors <- function(edo, fun=function(x){return(TRUE)}, which=c('both','ta
 ##' 
 ##' @title Discard all but relevant actors 
 ##' @param edo Event data
-##' @param source Function that returns \code{TRUE} for source actor codes, or actor name.
-##' @param target Function that returns \code{TRUE} for target actor codes, or actor name.
-##' @return All events in which one of the sources does something to one of the targets
+##' @param source Function that returns \code{TRUE} for source actor codes, or actor name, or vector of names.
+##' @param target Function that returns \code{TRUE} for target actor codes, or actor name, or vector of names.
+##' @return All events in involving the specified source and target
 ##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_actors}}
 ##' @export
 ##' @author Will Lowe
-filter_dyad <- function(edo, source=function(x){return(TRUE)}, target=function(x){return(TRUE)}){
-  if (is.character(source))
-    sourceFUN <- function(x){ x==source }
-  else
+filter_dyad <- function(edo, source=function(x){TRUE}, 
+                        target=function(x){TRUE}){
+  if (is.character(source)){
+    sourceFUN <- spotter(source)
+  } else {
     sourceFUN <- source
-  if (is.character(target))
-    targetFUN <- function(x){ x==target }
-  else
+  }
+  if (is.character(target)){
+    targetFUN <- spotter(target)
+  } else {
     targetFUN <- target
-
+  }
+  
   filter(edo, sourceFUN(source), targetFUN(target))
 }
 
@@ -419,14 +439,14 @@ filter_dyad <- function(edo, source=function(x){return(TRUE)}, target=function(x
 ##' 
 ##' @title Discard all but relevant event codes
 ##' @param edo Event data
-##' @param fun Function that returns \code{TRUE} for event codes, or single event code, that should not be discarded
+##' @param fun Function that returns \code{TRUE} for event codes that should not be discarded, or single event code, or a vector of them.
 ##' @return Event data containing only events that pass through \code{fun}
 ##' @seealso \code{\link{filter_actors}}, \code{\link{filter_time}}
 ##' @export
 ##' @author Will Lowe
 filter_codes <- function(edo, fun=function(x){return(TRUE)}){
   if (is.character(fun))
-    codeFUN <- function(x){ x==fun }
+    codeFUN <- spotter(fun)
   else
     codeFUN <- fun
   
@@ -435,7 +455,7 @@ filter_codes <- function(edo, fun=function(x){return(TRUE)}){
 
 ##' Restricts events to a time period
 ##'
-##' Restricts events on or after \code{start} and before or on \code{end}.
+##' Restricts events on or after \code{start} and on or before \code{end}.
 ##' @title Restrict events to a time period
 ##' @param edo Event data
 ##' @param start Something convertable to a \code{Date} object
@@ -475,6 +495,19 @@ actors <- function(edo){
 ##' @author Will Lowe
 targets <- function(edo){
   sort(unique(as.character(edo$target)))
+}
+
+##' Cross-tabulate actor interactions
+##'
+##' A cross-tabulation of events in terms of their source and target actors. 
+##' 
+##' @title cross-tabulate source and target actor interaction counts
+##' @param edo Event data
+##' @return Table of actor interaction counts
+##' @export
+##' @author Will Lowe
+actor_interactions <- function(edo){
+  with(edo, table(source, target))
 }
 
 ##' Lists source actor codes
@@ -619,9 +652,11 @@ make_dyads <- function(edo, scale=NULL,
         arrange(events.temp.unit)
       colnames(dd)[1] <- "date"
       dd <- merge(tstamps, dd, all.x=TRUE)
-      mutate(dd, 
-             N=ifelse(is.na(N), 0, N),
-             est=ifelse(is.na(est), missing.data, est))
+      gg <- mutate(dd, 
+                   N=ifelse(is.na(N), 0, N),
+                   est=ifelse(is.na(est), missing.data, est))
+      class(gg) <- c("scaled_directed_dyad", class(gg))
+      gg
     }
     ff <- lapply(split(edo, edo$events.dyad), scale.func)
   }
@@ -637,8 +672,8 @@ make_dyads <- function(edo, scale=NULL,
 ##' @return Nothing, used for side effect
 ##' @export
 ##' @author Will Lowe
-plot_dyad <- function(dyad, ...){
-  gg <- as.xts(dyad$est, order.by=as.Date(dyad$date))
+plot.scaled_directed_dyad <- function(x, ...){
+  gg <- as.xts(x$est, order.by=as.Date(x$date))
   plot(gg, ..., main=NULL) 
 }
 

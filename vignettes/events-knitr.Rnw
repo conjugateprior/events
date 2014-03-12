@@ -149,7 +149,7 @@ tail(dyads$ser.bos)
 @
 The directed dyad can be treated like a regular time series:
 <<serbos,fig.height=4>>=
-plot_dyad(dyads$ser.bos)
+plot(dyads$ser.bos)
 @
 There are a few gaps in this series.  This is because the scale does not cover all the events that occur in the event data.  We can investigate this further with
 <<gaps,>>=

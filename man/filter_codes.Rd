@@ -8,8 +8,8 @@ filter_codes(edo, fun = function(x) {     return(TRUE) })
   \item{edo}{Event data}
 
   \item{fun}{Function that returns \code{TRUE} for event
-  codes, or single event code, that should not be
-  discarded}
+  codes that should not be discarded, or single event code,
+  or a vector of them.}
 }
 \value{
 Event data containing only events that pass through

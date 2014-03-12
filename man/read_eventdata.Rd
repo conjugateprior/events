@@ -50,7 +50,7 @@ are not searched for.
 
 The code plucks out just these columns, formats them
 appropriately and ignores everything else in the file.
-Only D, S, T, C, and C are required.
+Only D, S, T, and C are required.
 
 The format of the date field is given by \code{format.date}
 }

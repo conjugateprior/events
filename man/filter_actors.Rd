@@ -2,7 +2,7 @@
 \alias{filter_actors}
 \title{Filter out events that do not involve specified actors}
 \usage{
-filter_actors(edo, fun = function(x) {     return(TRUE) }, which = c("both",
+filter_actors(edo, fun = function(x) {     TRUE }, which = c("both",
   "target", "source", "either"))
 }
 \arguments{
@@ -20,7 +20,7 @@ filter_actors(edo, fun = function(x) {     return(TRUE) }, which = c("both",
 Events involving only actors that pass through \code{fun}
 }
 \description{
-Filters out events not involving specified actors
+Filters out events that do not involve specified actors
 }
 \details{
 The \code{which} parameter specifies whether the filter
