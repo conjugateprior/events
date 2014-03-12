@@ -1,0 +1,18 @@
+\docType{data}
+\name{gulf.cameo}
+\alias{gulf.cameo}
+\title{Gulf States' events in CAMEO encoding}
+\description{
+Event data for th Gulf States.  Events are coded according
+to the CAMEO scheme by the KEDS Project. The event stream
+contains 29029 events occurring between 03/01/1992 and
+07/31/2006 involving 411 sources and 397 targets.
+}
+\author{
+KEDS Project
+}
+\references{
+\url{http://www.parusanalytics.com/eventdata/data.dir/gulf.html}
+}
+\keyword{data}
+

@@ -1,0 +1,22 @@
+\docType{data}
+\name{turkey.cameo}
+\alias{turkey.cameo}
+\title{Turkey events in CAMEO encoding}
+\description{
+Event data for Turkey.  Events are coded according to the
+CAMEO scheme by the KEDS Project.  The event stream
+contains 54466 events involving 164 sources and 166 targets
+between 15/04/1979 and 31/03/1999.
+}
+\details{
+Note: This is the data set with only leads coded
+(GULF99.zip)
+}
+\author{
+KEDS Project
+}
+\references{
+\url{http://www.parusanalytics.com/eventdata/data.dir/turkey.html}
+}
+\keyword{data}
+

@@ -2,25 +2,25 @@
 \alias{codes}
 \title{List event codes}
 \usage{
-  codes(edo)
+codes(edo)
 }
 \arguments{
   \item{edo}{Event data}
 }
 \value{
-  Array of event codes
+Array of event codes
 }
 \description{
-  Lists event codes
+Lists event codes
 }
 \details{
-  Lists all the event codes that appear in the event data
+Lists all the event codes that appear in the event data
 }
 \author{
-  Will Lowe
+Will Lowe
 }
 \seealso{
-  \code{\link{sources}}, \code{\link{targets}},
-  \code{\link{actors}}
+\code{\link{sources}}, \code{\link{targets}},
+\code{\link{actors}}
 }
 

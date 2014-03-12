@@ -2,7 +2,7 @@
 \alias{summary.eventscale}
 \title{Summarise an eventscale}
 \usage{
-  \method{summary}{eventscale} (object, ...)
+\method{summary}{eventscale}(object, ...)
 }
 \arguments{
   \item{object}{Scale}
@@ -10,15 +10,15 @@
   \item{...}{Not used}
 }
 \value{
-  Nothing, used for side effect
+Nothing, used for side effect
 }
 \description{
-  Summarise an eventscale
+Summarise an eventscale
 }
 \details{
-  Print summary statistics for an eventscale.
+Print summary statistics for an eventscale.
 }
 \author{
-  Will Lowe
+Will Lowe
 }
 

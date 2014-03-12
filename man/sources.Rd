@@ -2,26 +2,26 @@
 \alias{sources}
 \title{List source actor codes}
 \usage{
-  sources(edo)
+sources(edo)
 }
 \arguments{
   \item{edo}{Event data}
 }
 \value{
-  Array of actor codes
+Array of actor codes
 }
 \description{
-  Lists source actor codes
+Lists source actor codes
 }
 \details{
-  Lists all the actor codes that appear as a source in the
-  event data in alphabetical order.
+Lists all the actor codes that appear as a source in the
+event data in alphabetical order.
 }
 \author{
-  Will Lowe
+Will Lowe
 }
 \seealso{
-  \code{\link{actors}}, \code{\link{targets}},
-  \code{\link{codes}}
+\code{\link{actors}}, \code{\link{targets}},
+\code{\link{codes}}
 }
 

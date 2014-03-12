@@ -2,7 +2,7 @@
 \alias{map_codes}
 \title{Aggregate event codes}
 \usage{
-  map_codes(edo, fun = function(x) {     return(x) })
+map_codes(edo, fun = function(x) {     return(x) })
 }
 \arguments{
   \item{edo}{Event data}
@@ -10,24 +10,24 @@
   \item{fun}{Function specifying the aggregation mapping}
 }
 \value{
-  Event data with new event codes
+Event data with new event codes
 }
 \description{
-  Aggregates event codes
+Aggregates event codes
 }
 \details{
-  This function relabels event codes according to
-  \code{fun}, The \code{mapper} function is an easy way to
-  make such a function.
+This function relabels event codes according to \code{fun},
+The \code{mapper} function is an easy way to make such a
+function.
 
-  This can also be used as a renaming function, but it is
-  most useful when multiple codes should be treated as
-  equivalent.
+This can also be used as a renaming function, but it is
+most useful when multiple codes should be treated as
+equivalent.
 }
 \author{
-  Will Lowe
+Will Lowe
 }
 \seealso{
-  \code{\link{map_actors}}
+\code{\link{map_actors}}
 }
 
