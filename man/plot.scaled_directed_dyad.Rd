@@ -2,7 +2,7 @@
 \alias{plot.scaled_directed_dyad}
 \title{Plot scaled directed dyad}
 \usage{
-\method{plot}{scaled_directed_dyad}(dyad, ...)
+\method{plot}{scaled_directed_dyad}(x, ...)
 }
 \arguments{
   \item{dyad}{One directed dyadic time series from the

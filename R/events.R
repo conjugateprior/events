@@ -627,7 +627,7 @@ make_dyads <- function(edo, scale=NULL,
                        unit='week', monday=TRUE, 
                        fun=function(x){ mean(x, na.rm=TRUE) }, 
                        missing.data=NA, actors=NULL) {
-  unit <- match.arg(unit)  
+  ##unit <- match.arg(unit)  
   ## Note: evenly spaced levels even when the data hasn't, courtesy of cut.Date
   temp.agg <- cut(edo$date, breaks=unit, start.on.monday=monday)
   tstamps <- data.frame(date=levels(temp.agg)) ## for merging into
