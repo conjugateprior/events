@@ -6,12 +6,13 @@ Date: 2013-01-21
 Author: Will Lowe
 Maintainer: Will Lowe <will.lowe@uni-mannheim.de>
 Depends:
-    R (>= 2.10),
-    dplyr,
-    xts
+    R (>= 2.10)
 Suggests:
     knitr
 Description: Stores, manipulates, aggregates and otherwise messes with event
     data from KEDS/TABARI or any other extraction tool with similar output
 License: GPL
 VignetteBuilder: knitr
+RoxygenNote: 5.0.0
+Imports: dplyr,
+    readr

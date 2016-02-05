@@ -300,6 +300,75 @@ read_keds <- function(d, keep.quote=FALSE, keep.label=TRUE, one.a.day=TRUE, scru
 	  date.format=date.format)	
 }
 
+
+#' Read in KEDS output files
+#'
+#' @param d one or more names of KEDS output
+#' @param one.a.day whether we should apply the one-a-day event filter?
+#'
+#' @return an event data set
+#' @export
+read_keds2 <- function(d, one.a.day=TRUE){
+  mkdata <- function(nm){
+    dplyr::mutate(
+      readr::read_tsv(nm, 
+                      col_names=c('date', 'source', 'target', 'code'), 
+                      col_types="cccc"), 
+      date=as.Date(date, format="%y%m%d")
+    )
+  }
+  
+  res <- dplyr::arrange(
+    dplyr::bind_rows(lapply(d, mkdata)),
+    date)
+  if (one.a.day)
+    dplyr::distinct(res, date, source, target, code)
+  else
+    res
+}
+  
+##' Reads Petrarch event data output files
+##'
+##' Reads Petrach output files and retains only the event date, the 
+##' main source and target actor codes, and the CAMEO and quad score 
+##' of the event. 
+##'
+##' Tested on the data sets at \url{http://phoenixdata.org/data}.
+##' Output column names are 'date', 'source', 'target', 'code' and 'score', if use.score is TRUE
+##'
+##' @param d name of a tsv containing events, or a list of such names 
+##' @return An event data set
+##' @export
+##' @author Will Lowe
+read_petrarch <- function(d, use.quad=FALSE, use.score=FALSE){
+  cnames <- c('date', 'source', 'target', 'code')
+  cinstr <- rep("_", 26)
+  cinstr[c(2,6,10)] <- "c" # date, source actor code, target actor code 
+  if (use.quad)
+    cinstr[16] <- "c"
+  else
+    cinstr[14] <- "c"
+  if (use.score){
+    cinstr[17] <- "d"
+    cnames <- c(cnames, "score")
+  }
+  if (use.score && use.quad)
+    message("Don't forget: these scores are for the CAMEO codes, not the quad codes used here")
+  
+  mkdata <- function(nm){
+    dplyr::mutate(
+      readr::read_tsv(nm, 
+                      col_names= cnames, 
+                      col_types = paste0(cinstr, collapse='')), 
+      date=as.Date(date, format="%Y%m%d")
+    )
+  }
+  dplyr::arrange(
+    dplyr::bind_rows(lapply(d, mkdata)),
+    date)
+}
+
+
 ##' Tries to remove duplicate events
 ##'
 ##' This function removes duplicates of any event that occurs to the same source
@@ -673,7 +742,7 @@ make_dyads <- function(edo, scale=NULL,
 ##' @export
 ##' @author Will Lowe
 plot.scaled_directed_dyad <- function(x, ...){
-  gg <- as.xts(x$est, order.by=as.Date(x$date))
+  gg <- as.ts(x$est, order.by=as.Date(x$date))
   plot(gg, ..., main=NULL) 
 }
 
