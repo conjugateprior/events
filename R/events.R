@@ -384,7 +384,7 @@ read_petrarch <- function(d, use.quad=FALSE, use.score=FALSE){
 ##' @export
 ##' @author Will Lowe
 one_a_day <- function(edo){
-	edo[!duplicated(edo[,1:4]),]
+  dplyr::distinct(edo, date, source, target, code)
 }
 
 ##' Summarises a set of event data
@@ -414,131 +414,6 @@ summary.eventdata <- function(object, ...){
   cat(paste("from", start, "to", end, "\n"))
 }
 
-##' Prints out the first few events of an event data set
-##' 
-##' @title Show the first few events in an event data set 
-##' @param edo Event data
-##' @return Silently returns the event data set
-##' @export
-##' @author Will Lowe
-print.eventdata <- function(edo, ...){
-  n <- nrow(edo)
-  if (n > 6){
-    print.data.frame(edo[1:6,], row.names=FALSE)
-    cat(paste0(" ...\n [ ", n, " events ending in ", edo$date[n], " ]")) 
-  } else {
-    print.data.frame(edo)
-  }
-  invisible(edo)
-}
-
-##' Filters out events that do not involve specified actors
-##'
-##' The \code{which} parameter specifies whether the filter should be applied
-##' only to actors in the target role, \code{'target'}, only to actors in the 
-##' source role, \code{'source'}, all actors in the event data, \code{'both'},
-##' or to any event having one of the specified actors in eithe rsource or target
-##' role, \code{'either'}.
-##' 
-##' \code{fun} can be specified as a function that returns true for particular actor names,
-##' or as a list of actor names to retain, or a single actor name.  The default \code{fun}
-##' and the default \code{which} settings return the event data unchanged. 
-##' 
-##' @title Filter out events that do not involve specified actors 
-##' @param edo Event data
-##' @param fun function that returns \code{TRUE} for actor names that should be retained, or a name, or a vector of names
-##' @param which Which actor roles should be filtered. Defaults to 'both' (\code{fun} must return true for source and target)
-##' @return Events involving only actors that pass through \code{fun}
-##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_dyad}}
-##' @export
-##' @author Will Lowe
-filter_actors <- function(edo, fun=function(x){TRUE}, 
-                          which=c('both','target','source', 'either')){
-  wh <- match.arg(which)
-  if (is.character(fun)){
-    FUN <- spotter(fun)
-  } else {
-    FUN <- fun
-  }
-  
-  if (wh=='both')
-    filter(edo, FUN(target) & FUN(source))
-  else if (wh=='either')
-    filter(edo, FUN(target) | FUN(source))
-  else if (wh=='target')
-    filter(edo, FUN(target))
-  else if (wh=='source')
-    filter(edo, FUN(source))  
-}
-
-
-##' Extracts a directed dyad
-##'
-##' The \code{source} parameter identifies sources and the \code{target} parameter specifies 
-##' the target names.
-##' 
-##' @title Discard all but relevant actors 
-##' @param edo Event data
-##' @param source Function that returns \code{TRUE} for source actor codes, or actor name, or vector of names.
-##' @param target Function that returns \code{TRUE} for target actor codes, or actor name, or vector of names.
-##' @return All events in involving the specified source and target
-##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_actors}}
-##' @export
-##' @author Will Lowe
-filter_dyad <- function(edo, source=function(x){TRUE}, 
-                        target=function(x){TRUE}){
-  if (is.character(source)){
-    sourceFUN <- spotter(source)
-  } else {
-    sourceFUN <- source
-  }
-  if (is.character(target)){
-    targetFUN <- spotter(target)
-  } else {
-    targetFUN <- target
-  }
-  
-  filter(edo, sourceFUN(source), targetFUN(target))
-}
-
-##' Discards all but relevant event codes
-##'
-##' Applies the filter function to each event code to see whether
-##' to keep the observation.  
-##' 
-##' @title Discard all but relevant event codes
-##' @param edo Event data
-##' @param fun Function that returns \code{TRUE} for event codes that should not be discarded, or single event code, or a vector of them.
-##' @return Event data containing only events that pass through \code{fun}
-##' @seealso \code{\link{filter_actors}}, \code{\link{filter_time}}
-##' @export
-##' @author Will Lowe
-filter_codes <- function(edo, fun=function(x){return(TRUE)}){
-  if (is.character(fun))
-    codeFUN <- spotter(fun)
-  else
-    codeFUN <- fun
-  
-  filter(edo, codeFUN(code))
-}
-
-##' Restricts events to a time period
-##'
-##' Restricts events on or after \code{start} and on or before \code{end}.
-##' @title Restrict events to a time period
-##' @param edo Event data
-##' @param start Something convertable to a \code{Date} object
-##' @param end Something convertable to a \code{Date} object
-##' @return Event data restricted to a time period
-##' @seealso \code{\link{filter_codes}}, \code{\link{filter_actors}}
-##' @export
-##' @author Will Lowe
-filter_time <- function(edo, start=min(edo$date), end=max(edo$date)){
-  st <- as.Date(start)
-  en <- as.Date(end)
-  filter(edo, date >= st & date <= en)
-}
-
 ##' Lists actor codes
 ##'
 ##' Lists all the actor codes that occur in the event data in alphabetical order.
@@ -549,7 +424,7 @@ filter_time <- function(edo, start=min(edo$date), end=max(edo$date)){
 ##' @export
 ##' @author Will Lowe
 actors <- function(edo){
-  sort(unique(c(as.character(edo$target), as.character(edo$source))))
+  sort(unique(c(edo$target, edo$source)))
 }
 
 ##' Lists target actor codes
@@ -604,70 +479,6 @@ sources <- function(edo){
 ##' @author Will Lowe
 codes <- function(edo){
   sort(unique(as.character(edo$code)))
-}
-
-##' Aggregates event data fields
-##'
-##' DEPRECATED This function applies a mapping/aggregration function to event data.
-##' It is the workhorse function behind the \code{map_} functions.
-##' You should use these in ordinary use.
-##'
-##' @title Aggregate field values 
-##' @param edo Event data
-##' @param fun Function specifying the aggregation mapping, or a list 
-##' @param which Name of the field to map
-##' @return Event data with new fields
-##' @seealso \code{\link{map_codes}}, \code{\link{map_actors}}
-##' @export
-##' @author Will Lowe
-map_eventdata <- function(edo, fun, which){
-  if (!is.function(fun))
-    fun <- mapper(fun)
-  edo[[which]] <- sapply(edo[[which]], fun)
-  return(edo)
-}
-
-##' Aggregates event codes
-##'
-##' This function relabels event codes according to \code{fun},
-##' The \code{mapper} function is an easy way to make such a function.
-##'
-##' This can also be used as a renaming function, but it is most
-##' useful when multiple codes should be treated as equivalent.
-##' 
-##' @title Aggregate event codes 
-##' @param edo Event data
-##' @param fun Function specifying the aggregation mapping 
-##' @return Event data with new event codes
-##' @seealso \code{\link{map_actors}}
-##' @export
-##' @author Will Lowe
-map_codes <- function(edo, fun=function(x){return(x)}){
-  if (!is.function(fun))
-    fun <- mapper(fun)
-  mutate(edo, code=fun(code))
-}
-
-##' Aggregates actor codes
-##'
-##' The function relabels actor codes according to \code{fun}.
-##' \code{mapper} provides an easy way to make a function specifying
-##' what things should now be called.
-##'
-##' This function can also be used as a renaming function, but it is most
-##' useful when multiple codes should be treated as equivalent.
-##' 
-##' @title Aggregate actor codes 
-##' @param edo Event data
-##' @param fun Function specifying the aggregation mapping
-##' @return Event data with new actor codes
-##' @seealso \code{\link{map_codes}}
-##' @export
-##' @author Will Lowe
-map_actors <- function(edo, fun=function(x){return(x)}){
-  if (!is.function(fun))
-    fun <- mapper(fun)  
-  mutate(edo, source=fun(source), target=fun(target))
 }
 
 ##' Aggregates events to a regular time interval
@@ -731,6 +542,8 @@ make_dyads <- function(edo, scale=NULL,
   }
   ff
 }
+
+#make_dyad(edo, source, target)
 
 ##' Plots scaled directed dyad
 ##'

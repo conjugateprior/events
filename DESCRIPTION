@@ -15,4 +15,5 @@ License: GPL
 VignetteBuilder: knitr
 RoxygenNote: 5.0.0
 Imports: dplyr,
-    readr
+    readr,
+    tidyr
