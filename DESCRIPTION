@@ -12,8 +12,7 @@ LazyData: true
 Depends:
     R (>= 3.0)
 Imports:
-    dplyr,
-    xts
+    dplyr
 Suggests:
     knitr
 VignetteBuilder: knitr

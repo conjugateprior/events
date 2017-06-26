@@ -23,20 +23,10 @@ Extracts a directed dyad
 \details{
 The \code{source} parameter identifies sources and the \code{target} parameter specifies 
 the target names.
-<<<<<<< HEAD
 }
 \seealso{
 \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_actors}}
-=======
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \author{
 Will Lowe
 }
-<<<<<<< HEAD
-=======
-\seealso{
-\code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_actors}}
-}
-
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2

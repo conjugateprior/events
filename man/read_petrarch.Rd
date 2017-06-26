@@ -24,4 +24,3 @@ Output column names are 'date', 'source', 'target', 'code' and 'score', if use.s
 \author{
 Will Lowe
 }
-

@@ -30,20 +30,10 @@ role, \code{'either'}.
 \code{fun} can be specified as a function that returns true for particular actor names,
 or as a list of actor names to retain, or a single actor name.  The default \code{fun}
 and the default \code{which} settings return the event data unchanged.
-<<<<<<< HEAD
 }
 \seealso{
 \code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_dyad}}
-=======
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \author{
 Will Lowe
 }
-<<<<<<< HEAD
-=======
-\seealso{
-\code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_dyad}}
-}
-
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2

@@ -75,7 +75,7 @@ test_mapper <- function(mapper, data){
   unmapped <- sp==data
   mapped <- sp!=data
   
-  mp <- list()
+  # mp <- list()
   nms <- unique(sp[mapped])
   cat("Mapped:\n")
   for (n in nms){
@@ -322,7 +322,7 @@ read_keds2 <- function(d, one.a.day=TRUE){
     dplyr::bind_rows(lapply(d, mkdata)),
     date)
   if (one.a.day)
-    dplyr::distinct(res, date, source, target, code)
+    dplyr::distinct_(res, 'date', 'source', 'target', 'code')
   else
     res
 }
@@ -384,7 +384,7 @@ read_petrarch <- function(d, use.quad=FALSE, use.score=FALSE){
 ##' @export
 ##' @author Will Lowe
 one_a_day <- function(edo){
-  dplyr::distinct(edo, date, source, target, code)
+  dplyr::distinct_(edo, 'date', 'source', 'target', 'code')
 }
 
 ##' Summarises a set of event data
@@ -414,7 +414,6 @@ summary.eventdata <- function(object, ...){
   cat(paste("from", start, "to", end, "\n"))
 }
 
-<<<<<<< HEAD
 ##' Prints out the first few events of an event data set
 ##' 
 ##' @title Show the first few events in an event data set 
@@ -463,13 +462,13 @@ filter_actors <- function(edo, fun=function(x){TRUE},
   }
   
   if (wh=='both')
-    dplyr::filter(edo, FUN(target) & FUN(source))
+    dplyr::filter(edo, FUN('target') & FUN('source'))
   else if (wh=='either')
-    dplyr::filter(edo, FUN(target) | FUN(source))
+    dplyr::filter(edo, FUN('target') | FUN('source'))
   else if (wh=='target')
-    dplyr::filter(edo, FUN(target))
+    dplyr::filter(edo, FUN('target'))
   else if (wh=='source')
-    dplyr::filter(edo, FUN(source))  
+    dplyr::filter(edo, FUN('source'))  
 }
 
 
@@ -520,7 +519,7 @@ filter_codes <- function(edo, fun=function(x){return(TRUE)}){
   else
     codeFUN <- fun
   
-  dplyr::filter(edo, codeFUN(code))
+  dplyr::filter(edo, codeFUN('code'))
 }
 
 ##' Restricts events to a time period
@@ -540,8 +539,6 @@ filter_time <- function(edo, start=min(edo$date), end=max(edo$date)){
   dplyr::filter(edo, date >= st & date <= en)
 }
 
-=======
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 ##' Lists actor codes
 ##'
 ##' Lists all the actor codes that occur in the event data in alphabetical order.
@@ -609,7 +606,6 @@ codes <- function(edo){
   sort(unique(as.character(edo$code)))
 }
 
-<<<<<<< HEAD
 ##' Aggregates event data fields
 ##'
 ##' DEPRECATED This function applies a mapping/aggregration function to event data.
@@ -649,7 +645,7 @@ map_eventdata <- function(edo, fun, which){
 map_codes <- function(edo, fun=function(x){return(x)}){
   if (!is.function(fun))
     fun <- mapper(fun)
-  dplyr::mutate(edo, code=fun(code))
+  dplyr::mutate(edo, code=fun('code'))
 }
 
 ##' Aggregates actor codes
@@ -671,11 +667,9 @@ map_codes <- function(edo, fun=function(x){return(x)}){
 map_actors <- function(edo, fun=function(x){return(x)}){
   if (!is.function(fun))
     fun <- mapper(fun)  
-  dplyr::mutate(edo, source=fun(source), target=fun(target))
+  dplyr::mutate_(edo, source=fun(source), target=fun('target'))
 }
 
-=======
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 ##' Aggregates events to a regular time interval
 ##'
 ##' In an event data set S, assume that \eqn{A}=\code{length(actors(S))} actors 
@@ -708,12 +702,12 @@ make_dyads <- function(edo, scale=NULL,
   temp.agg <- cut(edo$date, breaks=unit, start.on.monday=monday)
   tstamps <- data.frame(date=levels(temp.agg)) ## for merging into
   
-  edo <- dplyr::mutate(edo, 
-                events.dyad=paste0(source, '.', target),
+  edo <- dplyr::mutate_(edo, 
+                events.dyad=paste0('source', '.', 'target'),
                 events.temp.unit=temp.agg)  
   
   if (!is.null(actors)) 
-    edo <- dplyr::filter(edo, (source %in% actors) & (target %in% actors))
+    edo <- dplyr::filter(edo, ('source' %in% actors) & ('target' %in% actors))
   
   if (is.null(scale)){
     tabul <- function(env){ with(env, table(events.temp.unit, code)) }
@@ -723,14 +717,14 @@ make_dyads <- function(edo, scale=NULL,
     
     scale.func <- function(dyad){
       dd <- dyad %>% 
-        dplyr::group_by(events.temp.unit) %>% 
-        dplyr::summarise(est=fun(events.scale), N=n()) %>% 
-        dplyr::arrange(events.temp.unit)
+        dplyr::group_by('events.temp.unit') %>% 
+        dplyr::summarise(est=fun('events.scale'), N=dplyr::n()) %>% 
+        dplyr::arrange('events.temp.unit')
       colnames(dd)[1] <- "date"
       dd <- merge(tstamps, dd, all.x=TRUE)
-      gg <- dplyr::mutate(dd, 
-                   N=ifelse(is.na(N), 0, N),
-                   est=ifelse(is.na(est), missing.data, est))
+      gg <- dplyr::mutate_(dd, 
+                   N=ifelse(is.na('N'), 0, 'N'),
+                   est=ifelse(is.na('est'), missing.data, 'est'))
       class(gg) <- c("scaled_directed_dyad", class(gg))
       gg
     }
@@ -751,11 +745,7 @@ make_dyads <- function(edo, scale=NULL,
 ##' @export
 ##' @author Will Lowe
 plot.scaled_directed_dyad <- function(x, ...){
-<<<<<<< HEAD
-  gg <- xts::as.xts(x$est, order.by=as.Date(x$date))
-=======
   gg <- as.ts(x$est, order.by=as.Date(x$date))
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
   plot(gg, ..., main=NULL) 
 }
 
@@ -910,7 +900,7 @@ summary.eventscale <- function(object, ...){
 ##' @author Will Lowe
 add_eventscale <- function(edo, sc){
   scname <- attr(sc, 'name') 
-  def <- attr(sc, 'default')
+  # def <- attr(sc, 'default')
   edo[[scname]] <- score(sc, edo$code)
   class(edo) <- c('scaled.eventdata', class(edo))
   return(edo)

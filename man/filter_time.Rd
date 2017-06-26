@@ -21,12 +21,6 @@ Restricts events to a time period
 }
 \details{
 Restricts events on or after \code{start} and on or before \code{end}.
-<<<<<<< HEAD
-=======
-}
-\author{
-Will Lowe
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \seealso{
 \code{\link{filter_codes}}, \code{\link{filter_actors}}

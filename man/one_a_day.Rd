@@ -21,12 +21,9 @@ and target with the same event code, on the assumption that these are
 in fact the same event reported twice.
 
 This function can also be applied as part of \code{\link{read_keds}}
-<<<<<<< HEAD
 }
 \seealso{
 \code{\link{read_keds}}
-=======
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \author{
 Will Lowe

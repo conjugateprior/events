@@ -17,20 +17,10 @@ Lists actor codes
 }
 \details{
 Lists all the actor codes that occur in the event data in alphabetical order.
-<<<<<<< HEAD
 }
 \seealso{
 \code{\link{sources}}, \code{\link{targets}}, \code{\link{codes}}
-=======
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \author{
 Will Lowe
 }
-<<<<<<< HEAD
-=======
-\seealso{
-\code{\link{sources}}, \code{\link{targets}}, \code{\link{codes}}
-}
-
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2

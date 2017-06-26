@@ -23,12 +23,6 @@ Aggregates event data fields
 DEPRECATED This function applies a mapping/aggregration function to event data.
 It is the workhorse function behind the \code{map_} functions.
 You should use these in ordinary use.
-<<<<<<< HEAD
-=======
-}
-\author{
-Will Lowe
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \seealso{
 \code{\link{map_codes}}, \code{\link{map_actors}}

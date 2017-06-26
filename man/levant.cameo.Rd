@@ -13,12 +13,6 @@ involving 741 sources and 688 targets.
 \details{
 Original data comes from file REULE.201111.evt with documentation lines
 (marked as DOC DOC 999), match information, and duplicates removed.
-<<<<<<< HEAD
-=======
-}
-\author{
-KEDS Project
->>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \references{
 \url{http://www.parusanalytics.com/eventdata/data.dir/levant.html}
