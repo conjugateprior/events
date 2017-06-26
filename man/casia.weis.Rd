@@ -13,6 +13,12 @@ involving 152 sources and 157 targets.
 \details{
 Original data comes from file CASIA.LEADS.6CODE (six character actor codes and coded from leads) 
 with duplicates removed using the one_a_day filter.
+<<<<<<< HEAD
+=======
+}
+\author{
+KEDS Project
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \references{
 \url{http://www.parusanalytics.com/eventdata/data.dir/casia.html}

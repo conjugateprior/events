@@ -10,6 +10,12 @@ of conflict and cooperation, developed by Joshua Goldstein and
 slightly extended for the KEDS project.  
 Note: This mapping does not cover all the event codes in \code{balkans.weis}.
 Taken from the KEDS Project's documentation.
+<<<<<<< HEAD
+=======
+}
+\author{
+KEDS Project
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \references{
 \url{http://web.ku.edu/~keds/}

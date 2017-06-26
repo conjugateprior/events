@@ -24,6 +24,12 @@ what things should now be called.
 
 This function can also be used as a renaming function, but it is most
 useful when multiple codes should be treated as equivalent.
+<<<<<<< HEAD
+=======
+}
+\author{
+Will Lowe
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \seealso{
 \code{\link{map_codes}}

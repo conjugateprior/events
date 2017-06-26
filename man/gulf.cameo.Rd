@@ -10,6 +10,12 @@ coded according to the CAMEO scheme by the KEDS Project.
 The event
 stream contains 29029 events occurring between 03/01/1992 and 07/31/2006
 involving 411 sources and 397 targets.
+<<<<<<< HEAD
+=======
+}
+\author{
+KEDS Project
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \references{
 \url{http://www.parusanalytics.com/eventdata/data.dir/gulf.html}

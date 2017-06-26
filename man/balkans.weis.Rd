@@ -9,6 +9,12 @@ Event data on the conflict during the collapse of Yugoslavia.  Events are
 coded according to an extended WEIS scheme by the KEDS Project.  The event
 stream contains 72953 events occurring between 2 April 1989 and 31 July 2003
 involving 325 actors.
+<<<<<<< HEAD
+=======
+}
+\author{
+KEDS Project
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \references{
 \url{http://www.parusanalytics.com/eventdata/data.dir/balk.html}

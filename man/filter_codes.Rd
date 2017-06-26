@@ -20,6 +20,12 @@ Discards all but relevant event codes
 \details{
 Applies the filter function to each event code to see whether
 to keep the observation.
+<<<<<<< HEAD
+=======
+}
+\author{
+Will Lowe
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \seealso{
 \code{\link{filter_actors}}, \code{\link{filter_time}}

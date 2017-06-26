@@ -12,6 +12,12 @@ between 15/04/1979 and 31/03/1999.
 }
 \details{
 Note: This is the data set with only leads coded (GULF99.zip)
+<<<<<<< HEAD
+=======
+}
+\author{
+KEDS Project
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \references{
 \url{http://www.parusanalytics.com/eventdata/data.dir/turkey.html}

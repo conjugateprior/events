@@ -1,3 +1,5 @@
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/events)](http://cranlogs.r-pkg.org/badges/events)
+
 # The events Package
 
 The aim of events is to make life a bit easier for people who

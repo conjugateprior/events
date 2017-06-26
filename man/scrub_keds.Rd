@@ -21,6 +21,12 @@ from the KEDS website.  This is a direct translation from the original
 PERL which replaces capital 'O's and small 'l's with 0 and 1
 respectively and removes the event code '---]', on the 
 assumption that these are all output noise.
+<<<<<<< HEAD
+=======
+}
+\author{
+Will Lowe
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
 }
 \seealso{
 \code{\link{read_keds}}

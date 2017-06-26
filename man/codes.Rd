@@ -24,3 +24,10 @@ Lists all the event codes that appear in the event data
 \author{
 Will Lowe
 }
+<<<<<<< HEAD
+=======
+\seealso{
+\code{\link{sources}}, \code{\link{targets}}, \code{\link{actors}}
+}
+
+>>>>>>> 04e7b17b1e0e1dc576ccecff1ee015c5e8a3d0e2
