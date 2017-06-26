@@ -393,13 +393,13 @@ filter_actors <- function(edo, fun=function(x){TRUE},
   }
   
   if (wh=='both')
-    filter(edo, FUN(target) & FUN(source))
+    dplyr::filter(edo, FUN(target) & FUN(source))
   else if (wh=='either')
-    filter(edo, FUN(target) | FUN(source))
+    dplyr::filter(edo, FUN(target) | FUN(source))
   else if (wh=='target')
-    filter(edo, FUN(target))
+    dplyr::filter(edo, FUN(target))
   else if (wh=='source')
-    filter(edo, FUN(source))  
+    dplyr::filter(edo, FUN(source))  
 }
 
 
@@ -429,7 +429,7 @@ filter_dyad <- function(edo, source=function(x){TRUE},
     targetFUN <- target
   }
   
-  filter(edo, sourceFUN(source), targetFUN(target))
+  dplyr::filter(edo, sourceFUN(source), targetFUN(target))
 }
 
 ##' Discards all but relevant event codes
@@ -450,7 +450,7 @@ filter_codes <- function(edo, fun=function(x){return(TRUE)}){
   else
     codeFUN <- fun
   
-  filter(edo, codeFUN(code))
+  dplyr::filter(edo, codeFUN(code))
 }
 
 ##' Restricts events to a time period
@@ -467,7 +467,7 @@ filter_codes <- function(edo, fun=function(x){return(TRUE)}){
 filter_time <- function(edo, start=min(edo$date), end=max(edo$date)){
   st <- as.Date(start)
   en <- as.Date(end)
-  filter(edo, date >= st & date <= en)
+  dplyr::filter(edo, date >= st & date <= en)
 }
 
 ##' Lists actor codes
@@ -576,7 +576,7 @@ map_eventdata <- function(edo, fun, which){
 map_codes <- function(edo, fun=function(x){return(x)}){
   if (!is.function(fun))
     fun <- mapper(fun)
-  mutate(edo, code=fun(code))
+  dplyr::mutate(edo, code=fun(code))
 }
 
 ##' Aggregates actor codes
@@ -598,7 +598,7 @@ map_codes <- function(edo, fun=function(x){return(x)}){
 map_actors <- function(edo, fun=function(x){return(x)}){
   if (!is.function(fun))
     fun <- mapper(fun)  
-  mutate(edo, source=fun(source), target=fun(target))
+  dplyr::mutate(edo, source=fun(source), target=fun(target))
 }
 
 ##' Aggregates events to a regular time interval
@@ -622,6 +622,7 @@ map_actors <- function(edo, fun=function(x){return(x)}){
 ##' @param actors An array of actor names from which to construct dyads. 
 ##' @return A list of named dyadic aggregated time series
 ##' @export
+##' @importFrom magrittr "%>%"
 ##' @author Will Lowe
 make_dyads <- function(edo, scale=NULL, 
                        unit='week', monday=TRUE, 
@@ -632,27 +633,27 @@ make_dyads <- function(edo, scale=NULL,
   temp.agg <- cut(edo$date, breaks=unit, start.on.monday=monday)
   tstamps <- data.frame(date=levels(temp.agg)) ## for merging into
   
-  edo <- mutate(edo, 
+  edo <- dplyr::mutate(edo, 
                 events.dyad=paste0(source, '.', target),
                 events.temp.unit=temp.agg)  
   
   if (!is.null(actors)) 
-    edo <- filter(edo, (source %in% actors) & (target %in% actors))
+    edo <- dplyr::filter(edo, (source %in% actors) & (target %in% actors))
   
   if (is.null(scale)){
     tabul <- function(env){ with(env, table(events.temp.unit, code)) }
     ff <- lapply(split(edo, edo$events.dyad), tabul)
   } else {
-    edo$events.scale <- edo[[scale]] ## can't do this in mutate either, weirdly
+    edo$events.scale <- edo[[scale]] ## can't do this in dplyr::mutate either, weirdly
     
     scale.func <- function(dyad){
-      dd <- dyad %.% 
-        group_by(events.temp.unit) %.% 
-        summarise(est=fun(events.scale), N=n()) %.% 
-        arrange(events.temp.unit)
+      dd <- dyad %>% 
+        dplyr::group_by(events.temp.unit) %>% 
+        dplyr::summarise(est=fun(events.scale), N=n()) %>% 
+        dplyr::arrange(events.temp.unit)
       colnames(dd)[1] <- "date"
       dd <- merge(tstamps, dd, all.x=TRUE)
-      gg <- mutate(dd, 
+      gg <- dplyr::mutate(dd, 
                    N=ifelse(is.na(N), 0, N),
                    est=ifelse(is.na(est), missing.data, est))
       class(gg) <- c("scaled_directed_dyad", class(gg))
@@ -673,7 +674,7 @@ make_dyads <- function(edo, scale=NULL,
 ##' @export
 ##' @author Will Lowe
 plot.scaled_directed_dyad <- function(x, ...){
-  gg <- as.xts(x$est, order.by=as.Date(x$date))
+  gg <- xts::as.xts(x$est, order.by=as.Date(x$date))
   plot(gg, ..., main=NULL) 
 }
 

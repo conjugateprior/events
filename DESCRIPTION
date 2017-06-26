@@ -1,17 +1,21 @@
 Package: events
 Type: Package
-Title: Store and manipulate event data
-Version: 0.7
-Date: 2013-01-21
-Author: Will Lowe
-Maintainer: Will Lowe <will.lowe@uni-mannheim.de>
-Depends:
-    R (>= 2.10),
+Title: Store and Manipulate Event Data
+Version: 0.7.1
+Date: 2017-06-24
+Authors@R: person("Will", "Lowe", email = "wlowe@princeton.edu", role = c("aut", "cre"))
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports:
     dplyr,
     xts
+Depends:
+    R (>= 2.10)
 Suggests:
     knitr
 Description: Stores, manipulates, aggregates and otherwise messes with event
-    data from KEDS/TABARI or any other extraction tool with similar output
+    data from KEDS/TABARI or any other extraction tool with similar output.
 License: GPL
 VignetteBuilder: knitr
+RoxygenNote: 6.0.1
