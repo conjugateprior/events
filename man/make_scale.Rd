@@ -4,8 +4,15 @@
 \alias{make_scale}
 \title{Make an event scale}
 \usage{
-make_scale(name, types = NULL, values = NULL, file = NULL, desc = "",
-  default = NA, sep = ",")
+make_scale(
+  name,
+  types = NULL,
+  values = NULL,
+  file = NULL,
+  desc = "",
+  default = NA,
+  sep = ","
+)
 }
 \arguments{
 \item{name}{Name of scale}
@@ -29,7 +36,7 @@ An event scale object
 Makes an event scale
 }
 \details{
-Makes an event scale from a specification found in a file or 
+Makes an event scale from a specification found in a file or
 using the \code{types} and \code{variables}
 parameters.  If a file is specified it is assumed to be headerless and to
 contain event codes in the first column and numerical values in the second

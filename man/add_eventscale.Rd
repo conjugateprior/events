@@ -19,7 +19,7 @@ Applies an eventscale to event data
 }
 \details{
 Applies an eventscale to event data.  This adds a new field in the event data
-with the same name as the eventscale.  Add as many as you want to keep 
+with the same name as the eventscale.  Add as many as you want to keep
 around.
 }
 \author{

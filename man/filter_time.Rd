@@ -20,7 +20,7 @@ Event data restricted to a time period
 Restricts events to a time period
 }
 \details{
-Restricts events on or after \code{start} and on or before \code{end}.
+Restricts events on or after \code{start} and before or on \code{end}.
 }
 \seealso{
 \code{\link{filter_codes}}, \code{\link{filter_actors}}

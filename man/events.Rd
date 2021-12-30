@@ -4,7 +4,6 @@
 \name{events}
 \alias{events}
 \alias{package-events}
-\alias{events-package}
 \title{Stores and manipulates event data}
 \description{
 Stores, manipulates, scales, aggregates and creates directed dyadic time series

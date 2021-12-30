@@ -4,12 +4,12 @@
 \alias{filter_codes}
 \title{Discard all but relevant event codes}
 \usage{
-filter_codes(edo, fun = function(x) {     return(TRUE) })
+filter_codes(edo, fun = function(x) TRUE)
 }
 \arguments{
 \item{edo}{Event data}
 
-\item{fun}{Function that returns \code{TRUE} for event codes that should not be discarded, or single event code, or a vector of them.}
+\item{fun}{Function that returns \code{TRUE} or event codes that should not be discarded}
 }
 \value{
 Event data containing only events that pass through \code{fun}

@@ -1,5 +1,3 @@
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/events)](http://cranlogs.r-pkg.org/badges/events)
-
 # The events Package
 
 The aim of events is to make life a bit easier for people who
@@ -13,8 +11,9 @@ The philosophy of the package is that you will want to read in raw
 event data and then apply a sequence of filters and aggregators for
 actors and event types, each of which will result in an new event data set.
 The final step is an application of `make_dyads` to make a set of named 
-temporally regular directed dyad time series suitable for time series analysis.
-All rather unix-ish, if you care for that sort of thing.
+temporally regular directed dyad time series suitable for time 
+series analysis. It's all rather unix-ish, if you care for that 
+sort of thing.
 
 There's a fairly complete walkthrough in the package vignette.  You
 should probably read that.
@@ -24,6 +23,7 @@ should probably read that.
 The package is ultimately intended to unify the existing software,
 e.g.  the packages currently linked from the [PSU event
 data](http://eventdata.psu.edu/software.dir/utilities.html) pages.
+(As of 30.12.2021 these pages are no longer available)
 
 The unification is certainly not complete, but we're getting there.
 In particular, extremely large data sets are probably going to be
@@ -44,9 +44,9 @@ This functionality is implemented as a standalone function
 This is also a standalone function `one_a_day` and available as an
 option in the event data reading function `read_keds`.
 
-### KEDS_Count
+### The KEDS_Count standalone program
 
-Most, but not all, of the functionality of KEDS_Count is implemented.  
+Most, but not all, of the functionality of `KEDS_Count` is implemented.  
 Some differences are noted below:
 
  * Aggregation is possible by day, week, month, quarter and year, but
@@ -86,13 +86,4 @@ function is (see above).
 Since I can't figure out what this program does, there are probably no
 functions to replicate it.
 
-### High-Volume Processing Suite
 
-All this stuff is currently out of reach, but there are plans for
-accessing databases as sources of event data.  That'll be how we scale.
-
-
-## TODO 
-
- * More test coverage.  `make_dyads` coverage is still lacking
- * Database connection for larger data sources

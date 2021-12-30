@@ -4,8 +4,14 @@
 \alias{read_keds}
 \title{Read KEDS events files}
 \usage{
-read_keds(d, keep.quote = FALSE, keep.label = TRUE, one.a.day = TRUE,
-  scrub.keds = TRUE, date.format = "\%y\%m\%d")
+read_keds(
+  d,
+  keep.quote = FALSE,
+  keep.label = TRUE,
+  one.a.day = TRUE,
+  scrub.keds = TRUE,
+  date.format = "\%y\%m\%d"
+)
 }
 \arguments{
 \item{d}{Names of files of KEDS/TABARI output}
@@ -33,11 +39,11 @@ around \code{read.csv}.
 
 This function assumes that \code{d} are a vector of KEDS/TABARI output files.
 These are assumed to be tab separated text files wherein the
-first field is a date in \code{yymmdd} format or as specified by \code{date.format}, 
+first field is a date in \code{yymmdd} format or as specified by \code{date.format},
 the second and third fields are actor
 codes, the fourth field is an event code, and the fifth field is a
 text label for the event type, and the sixth field is a quote - some kind of
-text from which the event code was inferred.  Label and quote are optional and can 
+text from which the event code was inferred.  Label and quote are optional and can
 be discarded when reading in.
 }
 \author{

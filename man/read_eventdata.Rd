@@ -4,9 +4,15 @@
 \alias{read_eventdata}
 \title{Read event data files}
 \usage{
-read_eventdata(d, col.format = "D.STC", one.a.day = TRUE,
-  scrub.keds = TRUE, date.format = "\%y\%m\%d", sep = "\\t",
-  header = FALSE)
+read_eventdata(
+  d,
+  col.format = "D.STC",
+  one.a.day = TRUE,
+  scrub.keds = TRUE,
+  date.format = "\%y\%m\%d",
+  sep = "\\t",
+  head = FALSE
+)
 }
 \arguments{
 \item{d}{Names of event data files}
@@ -21,7 +27,7 @@ read_eventdata(d, col.format = "D.STC", one.a.day = TRUE,
 
 \item{sep}{File separator}
 
-\item{header}{Whether there is a header row in d}
+\item{head}{Whether there is a header row in d}
 }
 \value{
 An event data set
@@ -45,11 +51,11 @@ ordering is given by the \code{col.format} parameter:
 \item Q the quote field (optional)
 \item . (or anything not shown above) an ignorable column
 }
-e.g. the defaul "D.STC" format means that column 1 is the date, column 2 should be 
+e.g. the defaul "D.STC" format means that column 1 is the date, column 2 should be
 ignored, column 3 is the source, column 4 is the target, and column 5 is the event
 code.  The optional quote and label column are not searched for.
 
-The code plucks out just these columns, formats them appropriately and ignores 
+The code plucks out just these columns, formats them appropriately and ignores
 everything else in the file.  Only D, S, T, and C are required.
 
 The format of the date field is given by \code{format.date}

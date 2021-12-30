@@ -1,19 +1,22 @@
 Package: events
 Type: Package
-Title: Store and Manipulate Event Data
-Description: Stores, manipulates, aggregates and otherwise messes with event
-    data from KEDS/TABARI or any other extraction tool with similar output.
-Version: 0.7.1
-Date: 2017-06-24
-Authors@R: person("Will", "Lowe", email = "wlowe@princeton.edu", role = c("aut", "cre"))
-License: GPL-3
+Title: Store and manipulate event data
+Version: 0.6
+Date: 2021-12-28
+Author: Will Lowe
+Maintainer: Will Lowe <conjugateprior@gmail.com>
+Depends: R (>= 2.10)
+Description: The events packages stores, manipulates, aggregates and 
+             otherwise messes with events data from KEDS/TABARI or 
+             any other extraction tool with similar output. Most
+             functions are now superseded by dplyr and tidyr.
+Imports: methods
+License: GPL
 Encoding: UTF-8
-LazyData: true
-Depends:
-    R (>= 3.0)
-Imports:
-    dplyr
-Suggests:
-    knitr
+RoxygenNote: 7.1.2
+Suggests: 
+    rmarkdown,
+    knitr,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1

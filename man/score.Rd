@@ -23,7 +23,7 @@ argument's scale values or the scale's default value if
 not recognized.
 
 You should use this function to avoid
-relying on the internal structure of event scales.  They 
+relying on the internal structure of event scales.  They
 are currently lists, but this may change.
 }
 \author{

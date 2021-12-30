@@ -1,13 +1,23 @@
 events 0.6
 ----------
 
-* switched to strings rather than endlessly recreated factors
-
+ * Updated the code to pass modern checks, the contact email to 
+   one that works, and the vignette to note that you can do 
+   everything here with dplyr and tidyr these days
+   
+ * read_eventdata now checks for KEDS documentation markers and 
+   ignores these lines (provided they always come first, which 
+   they seem to empirically)
+    
+ * An rmd vignette
+ 
+ * `as.data.frame` generic implemented sensibly for event scale objects
 
 events 0.5
 ----------
 
- * Made read_keds a special case of read_eventdata, a general purpose event data data reading function
+ * Made read_keds a special case of read_eventdata, a general purpose 
+   event data data reading function
 
  * read_keds now reads multiple output files
 

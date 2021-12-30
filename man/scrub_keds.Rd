@@ -16,10 +16,10 @@ Event data
 Removes well-known noise from KEDS output files
 }
 \details{
-This function applies the regular expression based cleaning routine 
-from the KEDS website.  This is a direct translation from the original 
+This function applies the regular expression based cleaning routine
+from the KEDS website.  This is a direct translation from the original
 PERL which replaces capital 'O's and small 'l's with 0 and 1
-respectively and removes the event code '---]', on the 
+respectively and removes the event code '---]', on the
 assumption that these are all output noise.
 }
 \seealso{

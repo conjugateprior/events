@@ -4,9 +4,14 @@
 \alias{make_dyads}
 \title{Aggregate events to a regular time interval}
 \usage{
-make_dyads(edo, scale = NULL, unit = "week", monday = TRUE,
-  fun = function(x) {     mean(x, na.rm = TRUE) }, missing.data = NA,
-  actors = NULL)
+make_dyads(
+  edo,
+  scale = NULL,
+  unit = c("week", "day", "month", "quarter", "year"),
+  monday = TRUE,
+  fun = mean,
+  missing.data = NA
+)
 }
 \arguments{
 \item{edo}{Event data}
@@ -20,8 +25,6 @@ make_dyads(edo, scale = NULL, unit = "week", monday = TRUE,
 \item{fun}{Aggregation function.  Should take a vector and return a scalar}
 
 \item{missing.data}{What weeks with no data are assigned}
-
-\item{actors}{An array of actor names from which to construct dyads.}
 }
 \value{
 A list of named dyadic aggregated time series
@@ -30,14 +33,14 @@ A list of named dyadic aggregated time series
 Aggregates events to a regular time interval
 }
 \details{
-In an event data set S, assume that \eqn{A}=\code{length(actors(S))} actors 
+In an event data set S, assume that \eqn{A}=\code{length(actors(S))} actors
 \eqn{K}=\code{length(codes(S))} event codes occur.  This function
-creates (by default) \eqn{A^2} data streams labelled by the combination of source and target
+creates \eqn{A^2} data streams labelled by the combination of source and target
 actors.  If \code{scale} is \code{NULL} these are \eqn{K}-dimensional time series of event counts.
 If \code{scale} names a scale that has been
 added to the event data \code{fun} is used to aggregate the events falling into
-each temporal interval. This creates a evenly spaced univariate interval-valued
-time series, possibly with missing data, for each directed dyad.
+each temporal interval. This creates a univariate interval valued
+time series for each directed dyad.
 }
 \author{
 Will Lowe

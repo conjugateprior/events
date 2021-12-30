@@ -2,37 +2,34 @@
 % Please edit documentation in R/events.R
 \name{filter_actors}
 \alias{filter_actors}
-\title{Filter out events that do not involve specified actors}
+\title{Discard all but elevant actors}
 \usage{
-filter_actors(edo, fun = function(x) {     TRUE }, which = c("both",
-  "target", "source", "either"))
+filter_actors(
+  edo,
+  fun = function(x) {     return(TRUE) },
+  which = c("both", "target", "source")
+)
 }
 \arguments{
 \item{edo}{Event data}
 
-\item{fun}{function that returns \code{TRUE} for actor names that should be retained, or a name, or a vector of names}
+\item{fun}{Function that returns \code{TRUE} for actor codes that should 
+not be discarded.}
 
-\item{which}{Which actor roles should be filtered. Defaults to 'both' (\code{fun} must return true for source and target)}
+\item{which}{What actor roles should be filtered}
 }
 \value{
-Events involving only actors that pass through \code{fun}
+Event data containing only actors that pass through \code{fun}
 }
 \description{
-Filters out events that do not involve specified actors
+Discards all but relevant actors
 }
 \details{
 The \code{which} parameter specifies whether the filter should be applied
-only to actors in the target role, \code{'target'}, only to actors in the 
-source role, \code{'source'}, all actors in the event data, \code{'both'},
-or to any event having one of the specified actors in eithe rsource or target
-role, \code{'either'}.
-
-\code{fun} can be specified as a function that returns true for particular actor names,
-or as a list of actor names to retain, or a single actor name.  The default \code{fun}
-and the default \code{which} settings return the event data unchanged.
+only to targets, only to sources, or to all actors in the event data.
 }
 \seealso{
-\code{\link{filter_codes}}, \code{\link{filter_time}}, \code{\link{filter_dyad}}
+\code{\link{filter_codes}}, \code{\link{filter_time}}
 }
 \author{
 Will Lowe
