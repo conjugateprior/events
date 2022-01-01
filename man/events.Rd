@@ -16,5 +16,5 @@ applying event scales, and constructing regular time series at a choice of
 temporal scales and measurement levels.
 }
 \author{
-Will Lowe \email{will.lowe@uni-mannheim.de}
+Will Lowe \email{conjugateprior@gmail.com}
 }

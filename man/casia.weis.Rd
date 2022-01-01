@@ -15,7 +15,7 @@ Original data comes from file CASIA.LEADS.6CODE (six character actor codes and c
 with duplicates removed using the one_a_day filter.
 }
 \references{
-\url{http://www.parusanalytics.com/eventdata/data.dir/casia.html}
+\url{https://www.parusanalytics.com/eventdata/data.dir/casia.html}
 }
 \author{
 KEDS Project

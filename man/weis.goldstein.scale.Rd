@@ -12,7 +12,7 @@ Note: This mapping does not cover all the event codes in \code{balkans.weis}.
 Taken from the KEDS Project's documentation.
 }
 \references{
-\url{http://web.ku.edu/~keds/}
+\url{https://eventdata.parusanalytics.com/data.dir/KEDS.WEIS.Codes.txt}
 }
 \author{
 KEDS Project

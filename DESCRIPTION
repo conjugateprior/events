@@ -1,15 +1,15 @@
 Package: events
 Type: Package
-Title: Store and manipulate event data
+Title: Store and Manipulate Event Data
 Version: 0.6
 Date: 2021-12-28
 Author: Will Lowe
 Maintainer: Will Lowe <conjugateprior@gmail.com>
 Depends: R (>= 2.10)
 Description: The events packages stores, manipulates, aggregates and 
-             otherwise messes with events data from KEDS/TABARI or 
+             otherwise messes with events data from 'TABARI' or 
              any other extraction tool with similar output. Most
-             functions are now superseded by dplyr and tidyr.
+             functions are now superseded.
 Imports: methods
 License: GPL
 Encoding: UTF-8

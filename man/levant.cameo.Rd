@@ -15,7 +15,7 @@ Original data comes from file REULE.201111.evt with documentation lines
 (marked as DOC DOC 999), match information, and duplicates removed.
 }
 \references{
-\url{http://www.parusanalytics.com/eventdata/data.dir/levant.html}
+\url{https://www.parusanalytics.com/eventdata/data.dir/levant.html}
 }
 \author{
 KEDS Project

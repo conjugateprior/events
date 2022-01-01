@@ -10,10 +10,10 @@ of conflict and cooperation, developed by the KEDS project.
 Taken from the documentation of the KEDS_Count software.
 }
 \details{
-The version of CAMEO used here is 0.9B5 [08.04.15].
+The version of CAMEO used here is 0.9B5 [07.03.2021].
 }
 \references{
-\url{http://web.ku.edu/~keds/}
+\url{https://eventdata.parusanalytics.com/cameo.dir/CAMEO.SCALE.txt}
 }
 \author{
 KEDS Project

@@ -756,8 +756,8 @@ inv.fisher.transform <- function(x, absminmax = 1) {
 #'
 #' @return a data.frame containing event codes and scores
 #' @export
-as.data.frame.eventscale <- function(x, row.names = NULL, optional = FALSE, 
-                                     ...){
+as.data.frame.eventscale <- function(x, row.names = NULL, 
+                                     optional = FALSE, ...){
   data.frame(code = names(x), score = unname(unlist(x)))
 }
 
@@ -776,7 +776,7 @@ as.data.frame.eventscale <- function(x, row.names = NULL, optional = FALSE,
 #' @name levant.cameo
 #' @docType data
 #' @author KEDS Project
-#' @references \url{http://www.parusanalytics.com/eventdata/data.dir/levant.html}
+#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/levant.html}
 #' @keywords data
 NULL
 
@@ -793,7 +793,7 @@ NULL
 #' @name casia.weis
 #' @docType data
 #' @author KEDS Project
-#' @references \url{http://www.parusanalytics.com/eventdata/data.dir/casia.html}
+#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/casia.html}
 #' @keywords data
 NULL
 
@@ -810,7 +810,7 @@ NULL
 #' @name turkey.cameo
 #' @docType data
 #' @author KEDS Project
-#' @references \url{http://www.parusanalytics.com/eventdata/data.dir/turkey.html}
+#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/turkey.html}
 #' @keywords data
 NULL
 
@@ -825,7 +825,7 @@ NULL
 #' @name gulf.cameo
 #' @docType data
 #' @author KEDS Project
-#' @references \url{http://www.parusanalytics.com/eventdata/data.dir/gulf.html}
+#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/gulf.html}
 #' @keywords data
 NULL
 
@@ -839,7 +839,7 @@ NULL
 #' @name balkans.weis
 #' @docType data
 #' @author KEDS Project
-#' @references \url{http://www.parusanalytics.com/eventdata/data.dir/balk.html}
+#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/balk.html}
 #' @keywords data
 NULL
 
@@ -854,7 +854,7 @@ NULL
 #' @name weis.goldstein.scale
 #' @docType data
 #' @author KEDS Project
-#' @references \url{http://web.ku.edu/~keds/}
+#' @references \url{https://eventdata.parusanalytics.com/data.dir/KEDS.WEIS.Codes.txt}
 #' @keywords data
 NULL
 
@@ -864,12 +864,12 @@ NULL
 #' of conflict and cooperation, developed by the KEDS project.
 #' Taken from the documentation of the KEDS_Count software.
 #'
-#' The version of CAMEO used here is 0.9B5 [08.04.15].
+#' The version of CAMEO used here is 0.9B5 [07.03.2021].
 #'
 #' @name cameo.scale
 #' @docType data
 #' @author KEDS Project
-#' @references \url{http://web.ku.edu/~keds/}
+#' @references \url{https://eventdata.parusanalytics.com/cameo.dir/CAMEO.SCALE.txt}
 #' @keywords data
 NULL
 
@@ -885,7 +885,7 @@ NULL
 #' applying event scales, and constructing regular time series at a choice of
 #' temporal scales and measurement levels. 
 #'
-#' @author Will Lowe \email{will.lowe@@uni-mannheim.de}
+#' @author Will Lowe \email{conjugateprior@gmail.com}
 #' @docType package
 #' @name events
 #' @aliases events package-events

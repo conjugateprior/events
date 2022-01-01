@@ -11,7 +11,7 @@ stream contains 72953 events occurring between 2 April 1989 and 31 July 2003
 involving 325 actors.
 }
 \references{
-\url{http://www.parusanalytics.com/eventdata/data.dir/balk.html}
+\url{https://www.parusanalytics.com/eventdata/data.dir/balk.html}
 }
 \author{
 KEDS Project
