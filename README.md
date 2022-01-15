@@ -1,8 +1,22 @@
 # The events Package
 
+## Installation
+
+When we get back on the CRAN wagon, you can install this package with
+```
+install.packages("events")
+```
+Until that day, you can install directly from Github using the `remotes`,
+which you'll want to install first. Then
+```
+remotes::install_github("events")
+```
+
+## Purpose
+
 The aim of events is to make life a bit easier for people who
 analyse event data: the kind of thing that KEDS/TABARI generates as
-output (see e.g. [here](http://eventdata.psu.edu)).  
+output (see e.g. from the Parus Analytics homepages).  
 There's nothing fancy in the package, just a hopefully logical
 interface to all the data massaging we do to event data
 before any actual analysis.
@@ -18,14 +32,23 @@ sort of thing.
 There's a fairly complete walkthrough in the package vignette.  You
 should probably read that.
 
+## Caveat
+
+This package was written before the tidyverse was in full swing. Consequently
+almost every function here can be done better and faster using functions 
+from dplyr and tidyr. 
+
+If you are a tidyverse-loving kind of person (like the package maintainer) 
+then the most useful thing about `events` is that it bundles some classic 
+KEDS/TABARI event data sets.
+
 ## Precursors
 
 The package is ultimately intended to unify the existing software,
-e.g.  the packages currently linked from the [PSU event
-data](http://eventdata.psu.edu/software.dir/utilities.html) pages.
-(As of 30.12.2021 these pages are no longer available)
+e.g.  the packages currently linked from the PSU event
+data pages. (As of 30.12.2021 these pages are anyway no longer available)
 
-The unification is certainly not complete, but we're getting there.
+The unification is certainly not complete.
 In particular, extremely large data sets are probably going to be
 rather unwieldy in the current version.
 
@@ -55,7 +78,7 @@ Some differences are noted below:
  * `read_keds` assumes that two digit year specifications 69 to 99
    indicate years between 1969 to 1999, and 00 to 68 indicate 2000 to 2068.  
    This is R and the POSIX standard interpretation for this needlessly
-   ambiguous date formulation.  In contrast KEDS_Count treats 28 to 99 as 
+   ambiguous date formulation.  In contrast the KEDS_Count program treats 28 to 99 as 
    in the twentieth century and 00 to 27 as in the twenty first century.
 
  * Wildcarding for actors and event codes is not implemented

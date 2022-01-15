@@ -120,7 +120,8 @@ summary(dd4)
 Scales are mappings from event codes to real numbers.  You can create your own event code by constructing 
 a headerless csv file with event codes in the first column and numbers in the second column, and reading it in with the `make_scale` command.  This is a thin wrapper around the `read.csv` function.  
 
-Here we will use the extended Goldstein scale bundled with the package [@Goldstein1992] (These codes are taken from http://web.ku.edu/~keds/data.dir/KEDS.WEIS.Codes.txt).  
+Here we will use the extended Goldstein scale bundled with the package [@Goldstein1992] 
+(These codes are taken from Phil Schrodt's pages at Parus Analytics).  
 This maps WEIS event codes onto a number representing level of conflict or cooperation.
 ```{r intro.scaling}
 data("weis.goldstein.scale")
