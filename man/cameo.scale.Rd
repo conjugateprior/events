@@ -13,7 +13,7 @@ Taken from the documentation of the KEDS_Count software.
 The version of CAMEO used here is 0.9B5 [07.03.2021].
 }
 \references{
-\url{https://eventdata.parusanalytics.com/cameo.dir/CAMEO.SCALE.txt}
+Parus Analytics: https://eventdata.parusanalytics.com/data.dir/cameo.html
 }
 \author{
 KEDS Project

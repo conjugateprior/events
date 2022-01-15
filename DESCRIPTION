@@ -6,10 +6,11 @@ Date: 2021-12-28
 Author: Will Lowe
 Maintainer: Will Lowe <conjugateprior@gmail.com>
 Depends: R (>= 2.10)
-Description: The events packages stores, manipulates, aggregates and 
-             otherwise messes with events data from 'TABARI' or 
-             any other extraction tool with similar output. Most
-             functions are now superseded.
+Description: The events packages manipulates, aggregates and 
+             otherwise messes with event data from 'KEDS' and 
+             'TABARI' software and those with similar output. Most
+             functions are now superseded by the 'dplyr' and 'tidyr'
+             packages.
 Imports: methods
 License: GPL
 Encoding: UTF-8

@@ -12,6 +12,9 @@ events 0.6
  * An rmd vignette
  
  * `as.data.frame` generic implemented sensibly for event scale objects
+ 
+ * `read_eventdata2` and `read_keds2` are slower than their counterparts but
+   more robust to line noise and pasted together KEDS output files.
 
 events 0.5
 ----------

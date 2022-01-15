@@ -12,7 +12,7 @@ stream contains 29029 events occurring between 03/01/1992 and 07/31/2006
 involving 411 sources and 397 targets.
 }
 \references{
-\url{https://www.parusanalytics.com/eventdata/data.dir/gulf.html}
+Parus Analytics: https://www.parusanalytics.com/eventdata/data.dir/gulf.html
 }
 \author{
 KEDS Project

@@ -98,10 +98,6 @@ read_eventdata <- function(d, col.format = "D.STC", one.a.day = TRUE,
       return(out)
     }
     
-    trim_whitespace <- function(x) {
-      as.vector(sapply(x, gsub, pattern = "^\\s+|\\s+$", replacement = ''))
-    }
-    
     date.col <- which.letter('D', col.format)
     source.col <- which.letter('S', col.format)
     target.col <- which.letter('T', col.format)
@@ -153,11 +149,97 @@ read_eventdata <- function(d, col.format = "D.STC", one.a.day = TRUE,
     return(ff)
   }
 
+##' Reads event data output files more robustly than read_eventdata
+##'
+##' Reads event data output and optionally applies the \code{\link{scrub_keds}}
+##' cleaning function and the \code{\link{one_a_day}} duplicate removal filter.
+##' This function is slower but more robust to line noise than 
+##' \code{\link{read_eventdata}}. Use this when that one fails.
+##'
+##' This function assumes that \code{d} is a vector of output files.
+##' These are assumed to be \code{sep}-separated text files.  The column
+##' ordering is given by the \code{col.format} parameter:
+##' \itemize{
+##' \item D the date field
+##' \item S the source actor field
+##' \item T the target actor field
+##' \item C the event code field
+##' \item L the event code label field (optional)
+##' \item Q the quote field (optional)
+##' \item . (or anything not shown above) an ignorable column
+##' }
+##' e.g. the defaul "D.STC" format means that column 1 is the date, column 2 should be
+##' ignored, column 3 is the source, column 4 is the target, and column 5 is the event
+##' code.  The optional quote and label column are not searched for.
+##'
+##' The code plucks out just these columns, formats them appropriately and ignores
+##' everything else in the file.  Only D, S, T, and C are required.
+##'
+##' The format of the date field is given by \code{format.date}
+##'
+##' @title Read event data files
+##' @param d Names of event data files
+##' @param col.format Format for columns in d (see details)
+##' @param one.a.day Whether to apply the duplicate event remover
+##' @param scrub.keds Whether to apply the data cleaner
+##' @param date.format How dates are represented in the orginal file
+##' @param sep File separator
+##' @param head Whether there is a header row in d
+##' @return An event data set
+##' @export
+##' @importFrom stats setNames 
+##' @importFrom stats na.omit
+##' @author Will Lowe
+read_eventdata2 <- function(d, col.format = "D.STC", one.a.day = TRUE,
+                            scrub.keds = TRUE, date.format = "%y%m%d",
+                            sep = '\t', head = FALSE) {
+  lopts <- c("date", "source", "target", "code", "label", "quote")
+  opts <- toupper(substring(lopts, 1, 1)) # DSTCLQ
+  inds <- match(opts, unlist(strsplit(col.format, NULL)))
+  mp <- na.omit(setNames(inds, lopts)) # mp["Source"] == 3
+  vnames <- names(mp)
+  
+  ll <- strsplit(readLines(d), sep) # fix no header
+  if (head)
+    ll <- ll[-1]
+  
+  val <- list()
+  for (v in vnames) {
+    message("Processing ", v, "s")
+    f <- function(x) try(x[mp[v]])
+    val[[v]] <- unlist(lapply(ll, f))
+  }
+  rem <- which(is.na(val[["date"]]) | val[["date"]] == "" | val[["source"]] == "DOC")
+  if (length(rem) > 0) {
+    if (head)
+      rem <- rem + 1
+    message("Removing unreadable lines: c(", paste0(rem, sep = ","), 
+            ")\nThese are usually trailing empty lines or DOC lines") 
+    val <- lapply(val, function(x) x[-rem])
+  }
+  df <- as.data.frame(val)
+  df$date <- as.Date(df$date, format = date.format)
+  df$source <- as.factor(df$source)
+  df$target <- as.factor(df$target)
+  df$code <- as.factor(df$code)
+  df <- df[order(df$date), ] # date order
+  
+  if (scrub.keds)
+    df <- scrub_keds(df)
+  
+  if (one.a.day)
+    df <- one_a_day(df)
+  
+  class(df) <- c("eventdata", class(df))
+  df
+}
+
 ##' Reads KEDS event data output files
 ##'
 ##' Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
-##' and the \code{\link{one_a_day}} duplicate removal filter.  This function is thin wrapper
-##' around \code{read.csv}.
+##' and the \code{\link{one_a_day}} duplicate removal filter.  
+##' This function is thin wrapper around \code{read_eventdata} which is 
+##' a thin wrapper around \code{read.csv}.
 ##'
 ##' This function assumes that \code{d} are a vector of KEDS/TABARI output files.
 ##' These are assumed to be tab separated text files wherein the
@@ -189,6 +271,44 @@ read_keds <- function(d, keep.quote = FALSE, keep.label = TRUE,
                    scrub.keds = scrub.keds,
                    date.format = date.format)
   }
+
+##' Reads KEDS event data output files more robustly than read_keds
+##'
+##' Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
+##' and the \code{\link{one_a_day}} duplicate removal filter. This function is 
+##' slower but more robust to line noise than 
+##' \code{\link{read_keds}}. Use this when that one fails.
+##'
+##' This function assumes that \code{d} are a vector of KEDS/TABARI output files.
+##' These are assumed to be tab separated text files wherein the
+##' first field is a date in \code{yymmdd} format or as specified by \code{date.format},
+##' the second and third fields are actor
+##' codes, the fourth field is an event code, and the fifth field is a
+##' text label for the event type, and the sixth field is a quote - some kind of
+##' text from which the event code was inferred.  Label and quote are optional and can
+##' be discarded when reading in.
+##'
+##' @title Read KEDS events files
+##' @param d Names of files of KEDS/TABARI output
+##' @param keep.quote Whether the exact noun phrase be retained
+##' @param keep.label Whether the label for the event code should be retained
+##' @param one.a.day Whether to apply the duplicate event remover
+##' @param scrub.keds Whether to apply the data cleaner
+##' @param date.format How dates are represented in the first column
+##' @return An event data set
+##' @export
+##' @author Will Lowe
+read_keds2 <- function(d, keep.quote = FALSE, keep.label = TRUE,
+                      one.a.day = TRUE, scrub.keds = TRUE, 
+                      date.format = "%y%m%d") {
+  form <- paste("DSTC", 
+                ifelse(keep.label, "L", ""),
+                ifelse(keep.quote, "Q", ""),
+                sep = '')
+  read_eventdata2(d, col.format = form, one.a.day = one.a.day,
+                 scrub.keds = scrub.keds,
+                 date.format = date.format)
+}
 
 ##' Tries to remove duplicate events
 ##'
@@ -776,7 +896,7 @@ as.data.frame.eventscale <- function(x, row.names = NULL,
 #' @name levant.cameo
 #' @docType data
 #' @author KEDS Project
-#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/levant.html}
+#' @references Parus Analytics: https://www.parusanalytics.com/eventdata/data.dir/levant.html
 #' @keywords data
 NULL
 
@@ -793,7 +913,7 @@ NULL
 #' @name casia.weis
 #' @docType data
 #' @author KEDS Project
-#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/casia.html}
+#' @references Parus Analytics: https://www.parusanalytics.com/eventdata/data.dir/casia.html
 #' @keywords data
 NULL
 
@@ -810,7 +930,7 @@ NULL
 #' @name turkey.cameo
 #' @docType data
 #' @author KEDS Project
-#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/turkey.html}
+#' @references Parus Analytics: https://www.parusanalytics.com/eventdata/data.dir/turkey.html
 #' @keywords data
 NULL
 
@@ -825,7 +945,7 @@ NULL
 #' @name gulf.cameo
 #' @docType data
 #' @author KEDS Project
-#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/gulf.html}
+#' @references Parus Analytics: https://www.parusanalytics.com/eventdata/data.dir/gulf.html
 #' @keywords data
 NULL
 
@@ -839,7 +959,7 @@ NULL
 #' @name balkans.weis
 #' @docType data
 #' @author KEDS Project
-#' @references \url{https://www.parusanalytics.com/eventdata/data.dir/balk.html}
+#' @references Parus Analytics: https://www.parusanalytics.com/eventdata/data.dir/balk.html
 #' @keywords data
 NULL
 
@@ -854,7 +974,7 @@ NULL
 #' @name weis.goldstein.scale
 #' @docType data
 #' @author KEDS Project
-#' @references \url{https://eventdata.parusanalytics.com/data.dir/KEDS.WEIS.Codes.txt}
+#' @references Parus Analytics: https://www.parusanalytics.com/eventdata/data.dir/weis.html
 #' @keywords data
 NULL
 
@@ -869,7 +989,7 @@ NULL
 #' @name cameo.scale
 #' @docType data
 #' @author KEDS Project
-#' @references \url{https://eventdata.parusanalytics.com/cameo.dir/CAMEO.SCALE.txt}
+#' @references Parus Analytics: https://eventdata.parusanalytics.com/data.dir/cameo.html
 #' @keywords data
 NULL
 
