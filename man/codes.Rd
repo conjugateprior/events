@@ -18,6 +18,12 @@ Lists event codes
 \details{
 Lists all the event codes that appear in the event data
 }
+\examples{
+data(levant.cameo)
+cod <- codes(levant.cameo)
+head(codes)
+tail(codes)
+}
 \seealso{
 \code{\link{sources}}, \code{\link{targets}}, \code{\link{actors}}
 }

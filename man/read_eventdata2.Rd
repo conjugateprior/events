@@ -11,7 +11,8 @@ read_eventdata2(
   scrub.keds = TRUE,
   date.format = "\%y\%m\%d",
   sep = "\\t",
-  head = FALSE
+  head = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ read_eventdata2(
 \item{sep}{File separator}
 
 \item{head}{Whether there is a header row in d}
+
+\item{verbose}{Whether to update read progress and report unreadable lines}
 }
 \value{
 An event data set
@@ -61,6 +64,14 @@ The code plucks out just these columns, formats them appropriately and ignores
 everything else in the file.  Only D, S, T, and C are required.
 
 The format of the date field is given by \code{format.date}
+}
+\examples{
+# the first 1000 lines of raw TABARI output for Levant data,
+# (see data set "levant.cameo" for complete unlabeled data set)
+lev1000 <- system.file("extdata", "levant.cameo.top1000.txt", 
+  package = "events") 
+evs1000 <- read_eventdata2(lev1000, col.format = "DSTCL")
+head(evs1000, 3)
 }
 \author{
 Will Lowe

@@ -36,7 +36,10 @@ Reads KEDS event data output files
 Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
 and the \code{\link{one_a_day}} duplicate removal filter.  
 This function is thin wrapper around \code{read_eventdata} which is 
-a thin wrapper around \code{read.csv}.
+a thin wrapper around \code{read.csv}. 
+
+For noisy datasets \code{\link{read_keds2}} is slower but more robust.
+Use that if this one fails.  
 
 This function assumes that \code{d} are a vector of KEDS/TABARI output files.
 These are assumed to be tab separated text files wherein the

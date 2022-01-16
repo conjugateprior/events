@@ -18,6 +18,12 @@ Lists actor codes
 \details{
 Lists all the actor codes that occur in the event data in alphabetical order.
 }
+\examples{
+data(levant.cameo)
+acts <- actors(levant.cameo)
+head(acts)
+tail(acts)
+}
 \seealso{
 \code{\link{sources}}, \code{\link{targets}}, \code{\link{codes}}
 }

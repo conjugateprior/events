@@ -4,12 +4,18 @@
 ##' true for exact matches to its arguments.
 ##'
 ##' @title Make a spotting function
-##' @param ... The items for which the new function should return \code{TRUE}
+##' @param ... The actor names for which the new function should return \code{TRUE}
 ##' @return A function
 ##' @export
 ##' @author Will Lowe
+##' @examples
+##' data("balkans.weis")
+##' head(balkans.weis, 3)
+##' sp <- spotter("SER", "SERMIL")
+##' events <- filter_actors(balkans.weis, sp)
+##' head(events, 3)
 spotter <- function(...) {
-  lst <- unlist(list(...))
+  lst <- c(...)
   f <- function(x) {
     x %in% lst
   }
@@ -31,8 +37,8 @@ spotter <- function(...) {
 ##' @seealso \code{\link{read_keds}}
 ##' @author Will Lowe
 scrub_keds <- function(edo) {
-  edo$code <- sub('O(\\d\\d)$', '0\\1', edo$code, perl = TRUE)
-  edo$code <- sub('l(\\d\\d)$', '1\\1', edo$code, perl = TRUE)
+  edo$code <- sub('O(\\d\\d)$', '0\\1', edo$code, perl = FALSE)
+  edo$code <- sub('l(\\d\\d)$', '1\\1', edo$code, perl = FALSE)
   good <- grep('^.*---].*$', edo$code, invert = TRUE)
   edo <- edo[good, ]
   edo$code <- factor(edo$code)
@@ -65,9 +71,15 @@ how_many_keds_doc_lines_to_skip <- function(fname, max = 500) {
 ##' \item Q the quote field (optional)
 ##' \item . (or anything not shown above) an ignorable column
 ##' }
-##' e.g. the defaul "D.STC" format means that column 1 is the date, column 2 should be
+##' e.g. the default "D.STC" format means that column 1 is the date, column 2 should be
 ##' ignored, column 3 is the source, column 4 is the target, and column 5 is the event
-##' code.  The optional quote and label column are not searched for.
+##' code.  In this specification no quote or label columns are extracted.
+##' 
+##' The specification need only use the period to generate correct spacing, e.g.
+##' if there are 10 fields in each line, the first five of which are: data, 
+##' something ignorable, source, target, event code, and the remaining five fields 
+##' are ignorable then ""D.STC" is sufficient to extract date, source, target, 
+##' and event code
 ##'
 ##' The code plucks out just these columns, formats them appropriately and ignores
 ##' everything else in the file.  Only D, S, T, and C are required.
@@ -88,6 +100,13 @@ how_many_keds_doc_lines_to_skip <- function(fname, max = 500) {
 ##' @importFrom stats aggregate
 ##' @importFrom methods is
 ##' @author Will Lowe
+##' @examples
+##' # the first 1000 lines of raw TABARI output for Levant data,
+##' # (see data set "levant.cameo" for complete unlabeled data set)
+##' lev1000 <- system.file("extdata", "levant.cameo.top1000.txt", 
+##'   package = "events") 
+##' evs1000 <- read_eventdata(lev1000, col.format = "DSTCL")
+##' head(evs1000, 3)
 read_eventdata <- function(d, col.format = "D.STC", one.a.day = TRUE,
                            scrub.keds = TRUE, date.format = "%y%m%d",
                            sep = '\t', head = FALSE) {
@@ -185,36 +204,51 @@ read_eventdata <- function(d, col.format = "D.STC", one.a.day = TRUE,
 ##' @param date.format How dates are represented in the orginal file
 ##' @param sep File separator
 ##' @param head Whether there is a header row in d
+##' @param verbose Whether to update read progress and report unreadable lines
 ##' @return An event data set
 ##' @export
 ##' @importFrom stats setNames 
 ##' @importFrom stats na.omit
+##' @importFrom utils txtProgressBar
+##' @importFrom utils setTxtProgressBar
 ##' @author Will Lowe
+##' @examples
+##' # the first 1000 lines of raw TABARI output for Levant data,
+##' # (see data set "levant.cameo" for complete unlabeled data set)
+##' lev1000 <- system.file("extdata", "levant.cameo.top1000.txt", 
+##'   package = "events") 
+##' evs1000 <- read_eventdata2(lev1000, col.format = "DSTCL")
+##' head(evs1000, 3)
 read_eventdata2 <- function(d, col.format = "D.STC", one.a.day = TRUE,
                             scrub.keds = TRUE, date.format = "%y%m%d",
-                            sep = '\t', head = FALSE) {
+                            sep = '\t', head = FALSE, verbose = TRUE) {
   lopts <- c("date", "source", "target", "code", "label", "quote")
   opts <- toupper(substring(lopts, 1, 1)) # DSTCLQ
   inds <- match(opts, unlist(strsplit(col.format, NULL)))
   mp <- na.omit(setNames(inds, lopts)) # mp["Source"] == 3
   vnames <- names(mp)
   
-  ll <- strsplit(readLines(d), sep) # fix no header
+  ll <- strsplit(readLines(d), sep) 
   if (head)
     ll <- ll[-1]
-  
+
+  if (verbose)
+    pb <- txtProgressBar(min = 0, max = length(vnames), style = 3)
   val <- list()
-  for (v in vnames) {
-    message("Processing ", v, "s")
-    f <- function(x) try(x[mp[v]])
-    val[[v]] <- unlist(lapply(ll, f))
+  for (vi in seq_along(vnames)) {
+    f <- function(x) try(x[mp[vnames[vi]]])
+    val[[vnames[vi]]] <- unlist(lapply(ll, f))
+    if (verbose)
+      setTxtProgressBar(pb, vi)
   }
+  if (verbose)
+    close(pb)
   rem <- which(is.na(val[["date"]]) | val[["date"]] == "" | val[["source"]] == "DOC")
   if (length(rem) > 0) {
     if (head)
       rem <- rem + 1
-    message("Removing unreadable lines: c(", paste0(rem, sep = ","), 
-            ")\nThese are usually trailing empty lines or DOC lines") 
+    if (verbose)
+      message("Removing unreadable lines:\n\t", compact_range(rem))
     val <- lapply(val, function(x) x[-rem])
   }
   df <- as.data.frame(val)
@@ -225,8 +259,7 @@ read_eventdata2 <- function(d, col.format = "D.STC", one.a.day = TRUE,
   df <- df[order(df$date), ] # date order
   
   if (scrub.keds)
-    df <- scrub_keds(df)
-  
+    df <- scrub_keds(df)  
   if (one.a.day)
     df <- one_a_day(df)
   
@@ -234,12 +267,42 @@ read_eventdata2 <- function(d, col.format = "D.STC", one.a.day = TRUE,
   df
 }
 
+compact_range <- function(s, output = c("code", "text")) {
+  s <- sort(s)
+  md <- match.arg(output)
+  di <- s[-length(s)] - s[-1]
+  head <- 1
+  ll <- list(s[1])
+  for (i in seq_along(di)) {
+    if (di[i] == -1)
+      ll[[head]] <- c(ll[[head]], s[i + 1])
+    else {
+      head <- head + 1
+      ll[[head]] <- s[i + 1]
+    }
+  }
+  jn <- ifelse(md == "text", "-", ":")
+  ff <- function(x){ 
+    if (length(x) > 1) 
+      paste0(x[c(1, length(x))], collapse = jn) 
+    else x 
+  }
+  mm <- paste0(lapply(ll, ff), collapse = ", ")
+  if (md == "code")
+    paste0("c(", mm, ")")
+  else
+    mm
+}
+
 ##' Reads KEDS event data output files
 ##'
 ##' Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
 ##' and the \code{\link{one_a_day}} duplicate removal filter.  
 ##' This function is thin wrapper around \code{read_eventdata} which is 
-##' a thin wrapper around \code{read.csv}.
+##' a thin wrapper around \code{read.csv}. 
+##' 
+##' For noisy datasets \code{\link{read_keds2}} is slower but more robust.
+##' Use that if this one fails.  
 ##'
 ##' This function assumes that \code{d} are a vector of KEDS/TABARI output files.
 ##' These are assumed to be tab separated text files wherein the
@@ -272,9 +335,10 @@ read_keds <- function(d, keep.quote = FALSE, keep.label = TRUE,
                    date.format = date.format)
   }
 
-##' Reads KEDS event data output files more robustly than read_keds
+##' Reads KEDS/TABARI event data output files more robustly than read_keds
 ##'
-##' Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
+##' Reads KEDS/TABARI output and optionally applies 
+##' the \code{\link{scrub_keds}} cleaning function
 ##' and the \code{\link{one_a_day}} duplicate removal filter. This function is 
 ##' slower but more robust to line noise than 
 ##' \code{\link{read_keds}}. Use this when that one fails.
@@ -294,20 +358,21 @@ read_keds <- function(d, keep.quote = FALSE, keep.label = TRUE,
 ##' @param keep.label Whether the label for the event code should be retained
 ##' @param one.a.day Whether to apply the duplicate event remover
 ##' @param scrub.keds Whether to apply the data cleaner
-##' @param date.format How dates are represented in the first column
+##' @param date.format How dates are represented in the date column
+##' @param verbose Whether to show progress and report unreadable lines
 ##' @return An event data set
 ##' @export
 ##' @author Will Lowe
 read_keds2 <- function(d, keep.quote = FALSE, keep.label = TRUE,
                       one.a.day = TRUE, scrub.keds = TRUE, 
-                      date.format = "%y%m%d") {
+                      date.format = "%y%m%d", verbose = TRUE) {
   form <- paste("DSTC", 
                 ifelse(keep.label, "L", ""),
                 ifelse(keep.quote, "Q", ""),
                 sep = '')
   read_eventdata2(d, col.format = form, one.a.day = one.a.day,
                  scrub.keds = scrub.keds,
-                 date.format = date.format)
+                 date.format = date.format, verbose = verbose)
 }
 
 ##' Tries to remove duplicate events
@@ -371,17 +436,24 @@ summary.eventdata <- function(object, ...) {
 ##'
 ##' @title Filter events data
 ##' @param edo Events data object
-##' @param fun Function that shoudl be applied
-##' @param which Which field should be filtered
+##' @param fun Function that should be applied
+##' @param which Which fields should be filtered
 ##' @return Event data
 ##' @author Will Lowe
+##' @export
+##' @examples
+##' data(levant.cameo)
+##' sp <- spotter("PAL", "ISR")
+##' ev_targ <- filter_eventdata(levant.cameo, sp, "target") # these actors as targets
+##' head(ev_targ, 3)
+##' ev_dyad <- filter_eventdata(levant.cameo, sp, c("source", "target")) # source and target
+##' head(ev_dyad, 3)
 filter_eventdata <- function(edo, fun, which) {
-  ## note the switch to character format
-  keep <- which(sapply(as.character(edo[[which]]), fun))
-  d <- edo[keep, ]
-  ## remove unused levels
-  d[[which]] <- factor(as.character(d[[which]]))
-  return(d)
+  keep <- Reduce(`&`, lapply(edo[which], fun))
+  edo <- edo[keep, ]
+  for (w in which) ## remove unused levels
+    edo[[w]] <- factor(as.character(edo[[w]]))
+  edo
 }
 
 ##' Discards all but relevant actors
@@ -398,21 +470,12 @@ filter_eventdata <- function(edo, fun, which) {
 ##' @seealso \code{\link{filter_codes}}, \code{\link{filter_time}}
 ##' @export
 ##' @author Will Lowe
-filter_actors <-
-  function(edo,
-           fun = function(x) {
-             return(TRUE)
-           },
-           which = c('both', 'target', 'source')) {
+filter_actors <- function(edo, fun = function(x) TRUE,
+    which = c('both', 'target', 'source')) {
     wh <- match.arg(which)
-    if (wh == 'both')
-      d <- filter_eventdata(filter_eventdata(edo, fun, 'target'), fun, 'source')
-    else if (wh == 'target')
-      d <- filter_eventdata(edo, fun, 'target')
-    else if (wh == 'source')
-      d <- filter_eventdata(edo, fun, 'source')
-    
-    d
+    if (wh == "both")
+      wh <- c("source", "target")
+    filter_eventdata(edo, fun, wh)
   }
 
 ##' Discards all but relevant event codes
@@ -436,12 +499,19 @@ filter_codes <- function(edo, fun = function(x) TRUE) {
 ##' Restricts events on or after \code{start} and before or on \code{end}.
 ##' @title Restrict events to a time period
 ##' @param edo Event data
-##' @param start Something convertable to a \code{Date} object
-##' @param end Something convertable to a \code{Date} object
+##' @param start A date or something convertable to a \code{Date} using as.Date
+##' @param end A date or something convertable to a \code{Date} using as.Date
 ##' @return Event data restricted to a time period
 ##' @seealso \code{\link{filter_codes}}, \code{\link{filter_actors}}
 ##' @export
 ##' @author Will Lowe
+##' @examples
+##' data(levant.cameo)
+##' ev_jan1980 <- filter_time(levant.cameo, start = as.Date("1980-01-01"), 
+##'   end = as.Date("1980-01-31"))
+##' ev_feb1980 <- filter_time(levant.cameo, start = "1980-02-01", end = "1980-01-29")
+##' ev_starttojan1980 <- filter_time(levant.cameo, end = "1980-01-29")
+##' head(ev_starttojan1980)
 filter_time <-  function(edo, start = min(edo$date), end = max(edo$date)) {
     st <- as.Date(start)
     en <- as.Date(end)
@@ -457,6 +527,11 @@ filter_time <-  function(edo, start = min(edo$date), end = max(edo$date)) {
 ##' @seealso \code{\link{sources}}, \code{\link{targets}}, \code{\link{codes}}
 ##' @export
 ##' @author Will Lowe
+##' @examples
+##' data(levant.cameo)
+##' acts <- actors(levant.cameo)
+##' head(acts)
+##' tail(acts)
 actors <- function(edo) {
   sort(unique(c(as.character(edo$target), as.character(edo$source))))
 }
@@ -471,6 +546,11 @@ actors <- function(edo) {
 ##' @seealso \code{\link{sources}}, \code{\link{actors}}, \code{\link{codes}}
 ##' @export
 ##' @author Will Lowe
+##' @examples
+##' data(levant.cameo)
+##' targs <- sources(levant.cameo)
+##' head(targs)
+##' tail(targs)
 targets <- function(edo) {
   sort(unique(as.character(edo$target)))
 }
@@ -485,6 +565,11 @@ targets <- function(edo) {
 ##' @seealso \code{\link{actors}}, \code{\link{targets}}, \code{\link{codes}}
 ##' @export
 ##' @author Will Lowe
+##' @examples
+##' data(levant.cameo)
+##' src <- sources(levant.cameo)
+##' head(src)
+##' tail(src)
 sources <- function(edo) {
   sort(unique(as.character(edo$source)))
 }
@@ -498,6 +583,11 @@ sources <- function(edo) {
 ##' @seealso \code{\link{sources}}, \code{\link{targets}}, \code{\link{actors}}
 ##' @export
 ##' @author Will Lowe
+##' @examples
+##' data(levant.cameo)
+##' cod <- codes(levant.cameo)
+##' head(codes)
+##' tail(codes)
 codes <- function(edo) {
   sort(unique(as.character(edo$code)))
 }
@@ -511,6 +601,10 @@ codes <- function(edo) {
 ##'
 ##' It can also be used as a renaming function, but it is most
 ##' useful when multiple codes should be treated as equivalent.
+##'
+##' For a detailed example of event code and actor aggregation 
+##' functions, see the 
+##' 'Actor Filtering' and Count Aggregation' section of the vignette.
 ##'
 ##' @title Aggregate event codes
 ##' @param edo Event data
@@ -569,6 +663,10 @@ make_fun_from_list <- function(lst) {
 ##' This function can also be used as a renaming function, but it is most
 ##' useful when multiple codes should be treated as equivalent.
 ##'
+##' For a detailed example of event code and actor aggregation 
+##' functions, see the 
+##' 'Actor Filtering' and Count Aggregation' section of the vignette.
+##'
 ##' @title Aggregate actor codes
 ##' @param edo Event data
 ##' @param fun Function or list specifying the aggregation mapping
@@ -599,6 +697,8 @@ map_actors <- function(edo, fun = function(x) x) {
 ##' added to the event data \code{fun} is used to aggregate the events falling into
 ##' each temporal interval. This creates a univariate interval valued
 ##' time series for each directed dyad.
+##' 
+##' See the vignette for more detail and a worked example.
 ##'
 ##' @title Aggregate events to a regular time interval
 ##' @param edo Event data

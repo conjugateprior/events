@@ -10,7 +10,8 @@ read_keds2(
   keep.label = TRUE,
   one.a.day = TRUE,
   scrub.keds = TRUE,
-  date.format = "\%y\%m\%d"
+  date.format = "\%y\%m\%d",
+  verbose = TRUE
 )
 }
 \arguments{
@@ -24,16 +25,19 @@ read_keds2(
 
 \item{scrub.keds}{Whether to apply the data cleaner}
 
-\item{date.format}{How dates are represented in the first column}
+\item{date.format}{How dates are represented in the date column}
+
+\item{verbose}{Whether to show progress and report unreadable lines}
 }
 \value{
 An event data set
 }
 \description{
-Reads KEDS event data output files more robustly than read_keds
+Reads KEDS/TABARI event data output files more robustly than read_keds
 }
 \details{
-Reads KEDS output and optionally applies the \code{\link{scrub_keds}} cleaning function
+Reads KEDS/TABARI output and optionally applies 
+the \code{\link{scrub_keds}} cleaning function
 and the \code{\link{one_a_day}} duplicate removal filter. This function is 
 slower but more robust to line noise than 
 \code{\link{read_keds}}. Use this when that one fails.

@@ -19,6 +19,12 @@ Lists source actor codes
 Lists all the actor codes that appear as a source in the event data
 in alphabetical order.
 }
+\examples{
+data(levant.cameo)
+src <- sources(levant.cameo)
+head(src)
+tail(src)
+}
 \seealso{
 \code{\link{actors}}, \code{\link{targets}}, \code{\link{codes}}
 }

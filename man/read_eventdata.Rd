@@ -51,14 +51,28 @@ ordering is given by the \code{col.format} parameter:
 \item Q the quote field (optional)
 \item . (or anything not shown above) an ignorable column
 }
-e.g. the defaul "D.STC" format means that column 1 is the date, column 2 should be
+e.g. the default "D.STC" format means that column 1 is the date, column 2 should be
 ignored, column 3 is the source, column 4 is the target, and column 5 is the event
-code.  The optional quote and label column are not searched for.
+code.  In this specification no quote or label columns are extracted.
+
+The specification need only use the period to generate correct spacing, e.g.
+if there are 10 fields in each line, the first five of which are: data, 
+something ignorable, source, target, event code, and the remaining five fields 
+are ignorable then ""D.STC" is sufficient to extract date, source, target, 
+and event code
 
 The code plucks out just these columns, formats them appropriately and ignores
 everything else in the file.  Only D, S, T, and C are required.
 
 The format of the date field is given by \code{format.date}
+}
+\examples{
+# the first 1000 lines of raw TABARI output for Levant data,
+# (see data set "levant.cameo" for complete unlabeled data set)
+lev1000 <- system.file("extdata", "levant.cameo.top1000.txt", 
+  package = "events") 
+evs1000 <- read_eventdata(lev1000, col.format = "DSTCL")
+head(evs1000, 3)
 }
 \author{
 Will Lowe

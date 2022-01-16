@@ -174,8 +174,20 @@ div.csl-indent {
 <p>A version of the Balkans data is built into the package. Here we load and summarise it.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;balkans.weis&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(balkans.weis)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 72953 events involving 295 sources and 296 targets </span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; from Sun Apr 02, 1989 to Thu Jul 31, 2003</span></span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       date               source             target              code          </span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Min.   :1989-04-02   Length:72953       Length:72953       Length:72953      </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1st Qu.:1994-03-17   Class :character   Class :character   Class :character  </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Median :1996-08-12   Mode  :character   Mode  :character   Mode  :character  </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Mean   :1997-01-04                                                           </span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3rd Qu.:1999-06-18                                                           </span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Max.   :2003-07-31                                                           </span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      desc          </span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Length:72953      </span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Class :character  </span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Mode  :character  </span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                    </span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                    </span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
 <p>An event data set can be constructed from text file event data output using the <code>read_keds</code> function. And event data set is essentially a data frame with column names <code>date</code>, <code>source</code>, <code>target</code>, and <code>code</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(balkans.weis)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         date source target code            desc</span></span>
@@ -220,13 +232,18 @@ A complete list of actors is given by <code>actors</code> function</p>
 <p>The optional <code>start</code> and <code>end</code> parameters may be anything that can be converted into a <code>Date</code> object.</p>
 <p>The new data set is considerably smaller than before</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dd4)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 853 events involving 2 sources and 2 targets </span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; from Fri Mar 15, 1991 to Tue Dec 26, 1995</span></span></code></pre></div>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       date            source    target        code               desc          </span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Min.   :1991-03-15   bos:396   bos:447   Length:853         Length:853        </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1st Qu.:1993-01-08   ser:457   ser:406   Class :character   Class :character  </span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Median :1994-02-08                       Mode  :character   Mode  :character  </span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Mean   :1994-02-21                                                            </span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3rd Qu.:1995-06-06                                                            </span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Max.   :1995-12-26</span></span></code></pre></div>
 </div>
 <div id="scaling" class="section level2">
 <h2>Scaling</h2>
 <p>Scales are mappings from event codes to real numbers. You can create your own event code by constructing a headerless csv file with event codes in the first column and numbers in the second column, and reading it in with the <code>make_scale</code> command. This is a thin wrapper around the <code>read.csv</code> function.</p>
-<p>Here we will use the extended Goldstein scale bundled with the package <span class="citation">(Goldstein 1992)</span> (These codes are taken from <a href="http://web.ku.edu/~keds/data.dir/KEDS.WEIS.Codes.txt" class="uri">http://web.ku.edu/~keds/data.dir/KEDS.WEIS.Codes.txt</a>).<br />
+<p>Here we will use the extended Goldstein scale bundled with the package <span class="citation">(Goldstein 1992)</span> (These codes are taken from Phil Schrodt’s pages at Parus Analytics).<br />
 This maps WEIS event codes onto a number representing level of conflict or cooperation.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;weis.goldstein.scale&quot;</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(weis.goldstein.scale)</span>

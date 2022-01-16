@@ -7,7 +7,7 @@
 spotter(...)
 }
 \arguments{
-\item{...}{The items for which the new function should return \code{TRUE}}
+\item{...}{The actor names for which the new function should return \code{TRUE}}
 }
 \value{
 A function
@@ -18,6 +18,13 @@ Hands back a function to spot the items it was given in (\code{...})
 \details{
 This is a convenience function for creates a function that returns
 true for exact matches to its arguments.
+}
+\examples{
+data("balkans.weis")
+head(balkans.weis, 3)
+sp <- spotter("SER", "SERMIL")
+events <- filter_actors(balkans.weis, sp)
+head(events, 3)
 }
 \author{
 Will Lowe

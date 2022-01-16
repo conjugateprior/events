@@ -6,7 +6,7 @@
 \usage{
 filter_actors(
   edo,
-  fun = function(x) {     return(TRUE) },
+  fun = function(x) TRUE,
   which = c("both", "target", "source")
 )
 }

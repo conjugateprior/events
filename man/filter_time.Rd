@@ -9,9 +9,9 @@ filter_time(edo, start = min(edo$date), end = max(edo$date))
 \arguments{
 \item{edo}{Event data}
 
-\item{start}{Something convertable to a \code{Date} object}
+\item{start}{A date or something convertable to a \code{Date} using as.Date}
 
-\item{end}{Something convertable to a \code{Date} object}
+\item{end}{A date or something convertable to a \code{Date} using as.Date}
 }
 \value{
 Event data restricted to a time period
@@ -21,6 +21,14 @@ Restricts events to a time period
 }
 \details{
 Restricts events on or after \code{start} and before or on \code{end}.
+}
+\examples{
+data(levant.cameo)
+ev_jan1980 <- filter_time(levant.cameo, start = as.Date("1980-01-01"), 
+  end = as.Date("1980-01-31"))
+ev_feb1980 <- filter_time(levant.cameo, start = "1980-02-01", end = "1980-01-29")
+ev_starttojan1980 <- filter_time(levant.cameo, end = "1980-01-29")
+head(ev_starttojan1980)
 }
 \seealso{
 \code{\link{filter_codes}}, \code{\link{filter_actors}}

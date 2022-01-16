@@ -9,9 +9,9 @@ filter_eventdata(edo, fun, which)
 \arguments{
 \item{edo}{Events data object}
 
-\item{fun}{Function that shoudl be applied}
+\item{fun}{Function that should be applied}
 
-\item{which}{Which field should be filtered}
+\item{which}{Which fields should be filtered}
 }
 \value{
 Event data
@@ -23,6 +23,14 @@ Applies a generic field filter to event data
 This function applies a filter function to event data.
 It is the workhorse function behind the \code{filter_} functions.
 You should use these in ordinary use.
+}
+\examples{
+data(levant.cameo)
+sp <- spotter("PAL", "ISR")
+ev_targ <- filter_eventdata(levant.cameo, sp, "target") # these actors as targets
+head(ev_targ, 3)
+ev_dyad <- filter_eventdata(levant.cameo, sp, c("source", "target")) # source and target
+head(ev_dyad, 3)
 }
 \author{
 Will Lowe
