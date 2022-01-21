@@ -4,7 +4,9 @@ Title: Store and Manipulate Event Data
 Version: 0.6.1
 Date: 2021-12-28
 Authors@R: 
-    person("William", "Lowe", , "conjugateprior@gmail.com", role = c("aut", "cre"),
+    person(given = "William", family = "Lowe", 
+           email = "conjugateprior@gmail.com", 
+           role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1549-6163"))
 Depends: R (>= 2.10)
 Description: The events package manipulates, aggregates and 
