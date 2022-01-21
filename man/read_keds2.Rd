@@ -2,7 +2,7 @@
 % Please edit documentation in R/events.R
 \name{read_keds2}
 \alias{read_keds2}
-\title{Read KEDS events files}
+\title{Read KEDS (or TABARI) events files}
 \usage{
 read_keds2(
   d,
@@ -50,6 +50,14 @@ codes, the fourth field is an event code, and the fifth field is a
 text label for the event type, and the sixth field is a quote - some kind of
 text from which the event code was inferred.  Label and quote are optional and can
 be discarded when reading in.
+}
+\examples{
+# the first 1000 lines of raw TABARI output for Levant data,
+# (see data set "levant.cameo" for complete unlabeled data set)
+lev1000 <- system.file("extdata", "levant.cameo.top1000.txt", 
+  package = "events") 
+evs1000 <- read_keds2(lev1000)
+head(evs1000, 3)
 }
 \author{
 Will Lowe

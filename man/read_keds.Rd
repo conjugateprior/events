@@ -2,7 +2,7 @@
 % Please edit documentation in R/events.R
 \name{read_keds}
 \alias{read_keds}
-\title{Read KEDS events files}
+\title{Read KEDS (or TABARI) events files}
 \usage{
 read_keds(
   d,

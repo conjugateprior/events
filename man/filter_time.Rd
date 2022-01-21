@@ -24,10 +24,13 @@ Restricts events on or after \code{start} and before or on \code{end}.
 }
 \examples{
 data(levant.cameo)
-ev_jan1980 <- filter_time(levant.cameo, start = as.Date("1980-01-01"), 
+ev_jan1980 <- filter_time(levant.cameo, 
+  start = as.Date("1980-01-01"), 
   end = as.Date("1980-01-31"))
-ev_feb1980 <- filter_time(levant.cameo, start = "1980-02-01", end = "1980-01-29")
-ev_starttojan1980 <- filter_time(levant.cameo, end = "1980-01-29")
+ev_feb1980 <- filter_time(levant.cameo, 
+  start = "1980-02-01", end = "1980-01-29")
+ev_starttojan1980 <- filter_time(levant.cameo, 
+  end = "1980-01-29")
 head(ev_starttojan1980)
 }
 \seealso{

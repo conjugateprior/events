@@ -16,8 +16,10 @@ New event data object with duplicate events removed
 Tries to remove duplicate events
 }
 \details{
-This function removes duplicates of any event that occurs to the same source
-and target with the same event code, on the assumption that these are
+This function removes duplicates of any event that occurs to 
+the same source
+and target on the same date with the same event code, 
+on the assumption that these are
 in fact the same event reported twice.
 
 This function can also be applied as part of \code{\link{read_keds}}

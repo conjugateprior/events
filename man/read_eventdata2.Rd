@@ -45,7 +45,7 @@ This function is slower but more robust to line noise than
 \code{\link{read_eventdata}}. Use this when that one fails.
 
 This function assumes that \code{d} is a vector of output files.
-These are assumed to be \code{sep}-separated text files.  The column
+These are assumed to be \code{sep}-separated text files. The column
 ordering is given by the \code{col.format} parameter:
 \itemize{
 \item D the date field

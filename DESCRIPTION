@@ -1,7 +1,7 @@
 Package: events
 Type: Package
 Title: Store and Manipulate Event Data
-Version: 0.6
+Version: 0.6.1
 Date: 2021-12-28
 Authors@R: 
     person("William", "Lowe", , "conjugateprior@gmail.com", role = c("aut", "cre"),

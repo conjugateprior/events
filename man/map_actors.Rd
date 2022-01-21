@@ -25,6 +25,10 @@ of an event when handed the old one, or a list structured like
 
 This function can also be used as a renaming function, but it is most
 useful when multiple codes should be treated as equivalent.
+
+For a detailed example of event code and actor aggregation 
+functions, see the 
+'Actor Filtering' and Count Aggregation' section of the vignette.
 }
 \seealso{
 \code{\link{map_codes}}

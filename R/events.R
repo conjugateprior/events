@@ -176,7 +176,7 @@ read_eventdata <- function(d, col.format = "D.STC", one.a.day = TRUE,
 ##' \code{\link{read_eventdata}}. Use this when that one fails.
 ##'
 ##' This function assumes that \code{d} is a vector of output files.
-##' These are assumed to be \code{sep}-separated text files.  The column
+##' These are assumed to be \code{sep}-separated text files. The column
 ##' ordering is given by the \code{col.format} parameter:
 ##' \itemize{
 ##' \item D the date field
@@ -228,10 +228,15 @@ read_eventdata2 <- function(d, col.format = "D.STC", one.a.day = TRUE,
   mp <- na.omit(setNames(inds, lopts)) # mp["Source"] == 3
   vnames <- names(mp)
   
-  ll <- strsplit(readLines(d), sep) 
-  if (head)
-    ll <- ll[-1]
-
+  # deal with multiple d
+  ll <- lapply(d, function(x){ 
+    lns <- strsplit(readLines(x), sep)
+    if (head)
+      lns <- lns[-1]
+    lns
+    })
+  ll <- do.call(c, ll)
+  
   if (verbose)
     pb <- txtProgressBar(min = 0, max = length(vnames), style = 3)
   val <- list()
@@ -248,7 +253,7 @@ read_eventdata2 <- function(d, col.format = "D.STC", one.a.day = TRUE,
     if (head)
       rem <- rem + 1
     if (verbose)
-      message("Removing unreadable lines:\n\t", compact_range(rem))
+      message("Removing unreadable lines:\n  ", compact_range(rem))
     val <- lapply(val, function(x) x[-rem])
   }
   df <- as.data.frame(val)
@@ -313,7 +318,7 @@ compact_range <- function(s, output = c("code", "text")) {
 ##' text from which the event code was inferred.  Label and quote are optional and can
 ##' be discarded when reading in.
 ##'
-##' @title Read KEDS events files
+##' @title Read KEDS (or TABARI) events files
 ##' @param d Names of files of KEDS/TABARI output
 ##' @param keep.quote Whether the exact noun phrase be retained
 ##' @param keep.label Whether the label for the event code should be retained
@@ -352,7 +357,7 @@ read_keds <- function(d, keep.quote = FALSE, keep.label = TRUE,
 ##' text from which the event code was inferred.  Label and quote are optional and can
 ##' be discarded when reading in.
 ##'
-##' @title Read KEDS events files
+##' @title Read KEDS (or TABARI) events files
 ##' @param d Names of files of KEDS/TABARI output
 ##' @param keep.quote Whether the exact noun phrase be retained
 ##' @param keep.label Whether the label for the event code should be retained
@@ -363,6 +368,13 @@ read_keds <- function(d, keep.quote = FALSE, keep.label = TRUE,
 ##' @return An event data set
 ##' @export
 ##' @author Will Lowe
+##' @examples
+##' # the first 1000 lines of raw TABARI output for Levant data,
+##' # (see data set "levant.cameo" for complete unlabeled data set)
+##' lev1000 <- system.file("extdata", "levant.cameo.top1000.txt", 
+##'   package = "events") 
+##' evs1000 <- read_keds2(lev1000)
+##' head(evs1000, 3)
 read_keds2 <- function(d, keep.quote = FALSE, keep.label = TRUE,
                       one.a.day = TRUE, scrub.keds = TRUE, 
                       date.format = "%y%m%d", verbose = TRUE) {
@@ -377,8 +389,10 @@ read_keds2 <- function(d, keep.quote = FALSE, keep.label = TRUE,
 
 ##' Tries to remove duplicate events
 ##'
-##' This function removes duplicates of any event that occurs to the same source
-##' and target with the same event code, on the assumption that these are
+##' This function removes duplicates of any event that occurs to 
+##' the same source
+##' and target on the same date with the same event code, 
+##' on the assumption that these are
 ##' in fact the same event reported twice.
 ##'
 ##' This function can also be applied as part of \code{\link{read_keds}}
@@ -507,10 +521,13 @@ filter_codes <- function(edo, fun = function(x) TRUE) {
 ##' @author Will Lowe
 ##' @examples
 ##' data(levant.cameo)
-##' ev_jan1980 <- filter_time(levant.cameo, start = as.Date("1980-01-01"), 
+##' ev_jan1980 <- filter_time(levant.cameo, 
+##'   start = as.Date("1980-01-01"), 
 ##'   end = as.Date("1980-01-31"))
-##' ev_feb1980 <- filter_time(levant.cameo, start = "1980-02-01", end = "1980-01-29")
-##' ev_starttojan1980 <- filter_time(levant.cameo, end = "1980-01-29")
+##' ev_feb1980 <- filter_time(levant.cameo, 
+##'   start = "1980-02-01", end = "1980-01-29")
+##' ev_starttojan1980 <- filter_time(levant.cameo, 
+##'   end = "1980-01-29")
 ##' head(ev_starttojan1980)
 filter_time <-  function(edo, start = min(edo$date), end = max(edo$date)) {
     st <- as.Date(start)

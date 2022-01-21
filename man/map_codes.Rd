@@ -25,6 +25,10 @@ form: \code{lst[[newname]] = c(oldname1, oldname2)}.
 
 It can also be used as a renaming function, but it is most
 useful when multiple codes should be treated as equivalent.
+
+For a detailed example of event code and actor aggregation 
+functions, see the 
+'Actor Filtering' and Count Aggregation' section of the vignette.
 }
 \seealso{
 \code{\link{map_actors}}

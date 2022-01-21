@@ -41,6 +41,8 @@ If \code{scale} names a scale that has been
 added to the event data \code{fun} is used to aggregate the events falling into
 each temporal interval. This creates a univariate interval valued
 time series for each directed dyad.
+
+See the vignette for more detail and a worked example.
 }
 \author{
 Will Lowe

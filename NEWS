@@ -1,3 +1,15 @@
+events 0.6.1
+----------
+
+ * Fixed a bug where read_events2 and read_keds2 would not accept
+  a vector of filenames as read_events and read_keds do
+   
+ * Updated documentation for the one a day filter to clarify that 
+   date, source, target, and event code determine duplicate status
+    
+ * Updated README and added reference to data.table
+ 
+
 events 0.6
 ----------
 

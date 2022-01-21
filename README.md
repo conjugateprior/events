@@ -6,8 +6,8 @@ When we get back on the CRAN wagon, you can install this package with
 ```
 install.packages("events")
 ```
-Until that day, you can install directly from Github using the `remotes`,
-which you'll want to install first. Then
+Until that day, you can install directly from Github using the `remotes`
+package, which you'll want to install first. Then
 ```
 remotes::install_github("events")
 ```
@@ -36,24 +36,24 @@ should probably read that.
 
 This package was written before the tidyverse was in full swing. Consequently
 almost every function here can be done better and faster using functions 
-from dplyr and tidyr. 
+from `dplyr` and `tidyr`. Or doubtless even faster using `data.table`
 
-If you are a tidyverse-loving kind of person (like the package maintainer) 
-then the most useful thing about `events` is that it bundles some classic 
-KEDS/TABARI event data sets.
+If you are a `data.table` or `tidyverse`-loving person (like the package maintainer) then the most useful thing about `events` is that it 
+bundles some classic KEDS/TABARI event data sets.
 
 ## Precursors
 
 The package is ultimately intended to unify the existing software,
 e.g.  the packages currently linked from the PSU event
-data pages. (As of 30.12.2021 these pages are anyway no longer available)
+data pages. (As of 30.12.2021 these pages are not available either)
 
 The unification is certainly not complete.
 In particular, extremely large data sets are probably going to be
 rather unwieldy in the current version.
 
 The sections below provide a quick compare and contrast to the 
-software available from PSU that works with event data output 
+software formerly available from Penn State and now from Parus 
+Anaytics, that work with event data output 
 (not Factiva stuff or actor dictionaries).
 
 ### scrubkeds
@@ -78,7 +78,8 @@ Some differences are noted below:
  * `read_keds` assumes that two digit year specifications 69 to 99
    indicate years between 1969 to 1999, and 00 to 68 indicate 2000 to 2068.  
    This is R and the POSIX standard interpretation for this needlessly
-   ambiguous date formulation.  In contrast the KEDS_Count program treats 28 to 99 as 
+   ambiguous date formulation.  In contrast the `KEDS_Count` 
+   program treats 28 to 99 as 
    in the twentieth century and 00 to 27 as in the twenty first century.
 
  * Wildcarding for actors and event codes is not implemented
@@ -87,26 +88,26 @@ Some differences are noted below:
    targets' is done by using `filter_actors` with a suitable second
    parameter.
 
- * KEDS_Count aggregates up to a temporal unit, e.g. a week,
+ * `KEDS_Count` aggregates up to a temporal unit, e.g. a week,
    differently to `events`:  It tosses events that occur before the
    beginning of the first full unit.  `make_dyads` does not.
    There is no warning about this behaviour, but then it doesn't eat
    your data either.
 
- * KEDS_Count only offers summed scores and provides the per time unit
+ * `KEDS_Count` only offers summed scores and provides the per time unit
    N to construct means.  This package will use any aggregating function
    you give it, e.g. `sd` or `median` and also automatically generate
    N.
    
 ### Aggregator
 
-Unlike Aggregator, events does not have a customizable aggregation
+Unlike `Aggregator`, events does not have a customizable aggregation
 period, but it is a lot more flexible about what the aggregation
 function is (see above).
 
 ### Event_Filter
 
-Since I can't figure out what this program does, there are probably no
+I can't figure out what this program did, so there are probably no
 functions to replicate it.
 
 
